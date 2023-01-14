@@ -1,0 +1,45 @@
+{
+    "url": "https://www.bilibili.com/video/BV1dM411F75v/?spm_id_from=333.1007.tianma.1-1-1.click",
+    "title": "职业哥都在用的准心汇总，总有一个你喜欢的！！！",
+    "site": "Bilibili",
+    "streams": {
+        "flv360": {
+            "container": "flv",
+            "quality": "流畅 360P",
+            "size": 3334747,
+            "src": [
+                "http://upos-sz-mirrorhw.bilivideo.com/upgcxcode/73/27/962682773/962682773-1-16.mp4?e=ig8euxZM2rNcNbRghbUVhoM1hbNBhwdEto8g5X10ugNcXBlqNxHxNEVE5XREto8KqJZHUa6m5J0SqE85tZvEuENvNC8xNEVE9EKE9IMvXBvE2ENvNCImNEVEK9GVqJIwqa80WXIekXRE9IMvXBvEuENvNCImNEVEua6m2jIxux0CkF6s2JZv5x0DQJZY2F8SkXKE9IB5QK==&deadline=1673610411&gen=playurl&nbs=1&oi=2028184604&os=hwbv&platform=pc&trid=280c4e97e2cc497f8e3671c60f6b62af&uipk=5&upsig=eb8c90f6db4a040d3342be459c5a307d&uparams=e,deadline,gen,nbs,oi,os,platform,trid,uipk&mid=0"
+            ]
+        },
+        "dash-flv480": {
+            "container": "mp4",
+            "quality": "清晰 480P",
+            "src": [
+                [
+                    "https://xy36x139x37x38xy.mcdn.bilivideo.cn:4483/upgcxcode/73/27/962682773/962682773-1-30033.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1673610410&gen=playurlv2&os=mcdn&oi=2028184604&trid=000046c5d03074f34e0aa6c920216a2c5204u&mid=0&platform=pc&upsig=1fb234f4b6884b4246c9d8e9b9e94113&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform&mcdnid=6000181&bvc=vod&nettype=0&orderid=0,3&buvid=&build=0&agrr=1&bw=44158&logo=A0000020"
+                ],
+                [
+                    "https://xy36x139x37x38xy.mcdn.bilivideo.cn:4483/upgcxcode/73/27/962682773/962682773-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1673610410&gen=playurlv2&os=mcdn&oi=2028184604&trid=000046c5d03074f34e0aa6c920216a2c5204u&mid=0&platform=pc&upsig=fa420eb3c4e25a2d0cbe3e8d8f9b31d4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform&mcdnid=6000181&bvc=vod&nettype=0&orderid=0,3&buvid=&build=0&agrr=1&bw=24733&logo=A0000020"
+                ]
+            ],
+            "size": 4615792
+        },
+        "dash-flv360": {
+            "container": "mp4",
+            "quality": "流畅 360P",
+            "src": [
+                [
+                    "https://xy36x139x37x38xy.mcdn.bilivideo.cn:4483/upgcxcode/73/27/962682773/962682773-1-30016.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1673610410&gen=playurlv2&os=mcdn&oi=2028184604&trid=000046c5d03074f34e0aa6c920216a2c5204u&mid=0&platform=pc&upsig=c359f98e4dbd53124df9760eb5a0e67c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform&mcdnid=6000181&bvc=vod&nettype=0&orderid=0,3&buvid=&build=0&agrr=1&bw=44008&logo=A0000020"
+                ],
+                [
+                    "https://xy36x139x37x38xy.mcdn.bilivideo.cn:4483/upgcxcode/73/27/962682773/962682773-1-30216.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1673610410&gen=playurlv2&os=mcdn&oi=2028184604&trid=000046c5d03074f34e0aa6c920216a2c5204u&mid=0&platform=pc&upsig=deb415412f2cf047b3e86a334413ee02&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform&mcdnid=6000181&bvc=vod&nettype=0&orderid=0,3&buvid=&build=0&agrr=1&bw=5307&logo=A0000020"
+                ]
+            ],
+            "size": 3304157
+        }
+    },
+    "extra": {
+        "referer": "https://www.bilibili.com/video/BV1dM411F75v/?spm_id_from=333.1007.tianma.1-1-1.click",
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"
+    }
+}
