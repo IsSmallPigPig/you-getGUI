@@ -6,13 +6,11 @@
 
 此项目基于 you-get 开发，调用终端向 you-get 发送命令以达到下载的效果。是为了帮助不使用 python 工具的人更方便的使用 you-get 这一下载神器
 
-此项目基于 MIT license 开源，我十分希望有优秀的作者能帮助我完成这个作品，此项目永不收费且永久开源
-
 
 
 ## 2 项目界面
 
-![image-20230114132520545](C:/Users/OUYANG/AppData/Roaming/Typora/typora-user-images/image-20230114132520545.png)
+![image-20230114132520545](README.assets/image-20230114132520545.png)
 
 
 
@@ -84,7 +82,9 @@
 
 ## 4 项目结构
 
-![image-20230114133902501](C:/Users/OUYANG/AppData/Roaming/Typora/typora-user-images/image-20230114133902501.png)
+------
+
+![image-20230114133902501](README.assets/image-20230114133902501.png)
 
 正如您所见，项目总体分为5个部分，分别为：
 
@@ -96,7 +96,11 @@
 
 我将会向您介绍各个分区的用处
 
+
+
 ### 4.1 Core
+
+------
 
 Core 是我为 you-get 写的 API，该文件夹可以复制出来单独使用
 
@@ -106,19 +110,23 @@ Core 文件夹涵盖了 you-get 大部分的指令，每一个指令都写了详
 
 ### 4.2 Date
 
+------
+
 Date 是用于存储必要的运行信息的（例如后续开发要解析的 json 文件就会暂存于该目录）
 
 
 
 ### 4.3 Download
 
-Download 是为电脑小白准备的一键安装 you-get 库。
+------
 
-原作者仓库链接：[twlz0ne/you-get_install: 一键安装 you-get 到 windows (github.com)](https://github.com/twlz0ne/you-get_install)
+Download 是为电脑小白准备的一键安装 you-get 库。
 
 
 
 ### 4.5 Tool
+
+------
 
 Tool 是本项目的主体
 
@@ -130,14 +138,40 @@ Tool 是本项目的主体
 
 ### 4.6 运行目录
 
+------
+
 运行目录中有环境配置文件以及 main.py 启动文件
 
 
 
 ## 5 一些问题
 
+------
+
 - 本项目目前并不支持 linux 
+
 - 本项目不支持多语言
 - 本项目未解决实时显示终端信息
 - 半成品状态
 
+
+
+## 6 基于项目
+
+------
+
+**ttk 渲染引擎：**[rdbende/Sun-Valley-ttk-theme: A gorgeous theme for ttk, based on Microsoft's Sun Valley visual styles ✨ (github.com)](https://github.com/rdbende/Sun-Valley-ttk-theme)
+
+**you-get：**[soimort/you-get: Dumb downloader that scrapes the web (github.com)](https://github.com/soimort/you-get)
+
+**一键部署 you-get 支持：**[twlz0ne/you-get_install: 一键安装 you-get 到 windows (github.com)](https://github.com/twlz0ne/you-get_install)
+
+由衷的感谢以上作者
+
+
+
+## 7 开源许可证
+
+------
+
+此项目基于 MIT license 开源，我十分希望有优秀的作者能帮助我完成这个作品，此项目永不收费且永久开源
