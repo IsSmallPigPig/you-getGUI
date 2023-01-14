@@ -1,6 +1,5 @@
 # you-get Download Tools
 
-------
 
 ## 1 项目简介
 
@@ -21,7 +20,6 @@
 
 #### 3.1 基础设置
 
-------
 
 ##### 1.1 视频下载链接
 
@@ -47,7 +45,6 @@
 
 #### 3.2 确认信息
 
-------
 
 如果您确认您填写的信息已经填写完毕，则可以点击此按钮。程序将会对您提供的信息转换为指令并指出您填写信息的问题
 
@@ -55,7 +52,6 @@
 
 #### 3.3 下载属性
 
-------
 
 ##### 3.1 清晰度下拉框
 
@@ -73,7 +69,6 @@
 
 #### 3.4 终端
 
-------
 
 终端是为了那些需要查看下载信息的用户提供的，在这里你可以看到操作完成后的输出（暂时未实现实时更新）
 
@@ -85,7 +80,6 @@
 
 ## 4 项目结构
 
-------
 
 ![image-20230114133902501](README.assets/image-20230114133902501.png)
 
@@ -103,7 +97,6 @@
 
 ### 4.1 Core
 
-------
 
 Core 是我为 you-get 写的 API，该文件夹可以复制出来单独使用
 
@@ -113,7 +106,6 @@ Core 文件夹涵盖了 you-get 大部分的指令，每一个指令都写了详
 
 ### 4.2 Date
 
-------
 
 Date 是用于存储必要的运行信息的（例如后续开发要解析的 json 文件就会暂存于该目录）
 
@@ -121,7 +113,6 @@ Date 是用于存储必要的运行信息的（例如后续开发要解析的 js
 
 ### 4.3 Download
 
-------
 
 Download 是为电脑小白准备的一键安装 you-get 库。
 
@@ -129,7 +120,6 @@ Download 是为电脑小白准备的一键安装 you-get 库。
 
 ### 4.5 Tool
 
-------
 
 Tool 是本项目的主体
 
@@ -141,7 +131,6 @@ Tool 是本项目的主体
 
 ### 4.6 运行目录
 
-------
 
 运行目录中有环境配置文件以及 main.py 启动文件
 
@@ -149,7 +138,6 @@ Tool 是本项目的主体
 
 ## 5 一些问题
 
-------
 
 - 本项目目前并不支持 linux 
 
@@ -161,13 +149,11 @@ Tool 是本项目的主体
 
 ## 6 基于项目
 
-------
+**ttk 渲染引擎：**[rdbende/Sun-Valley-ttk-theme](https://github.com/rdbende/Sun-Valley-ttk-theme)
 
-**ttk 渲染引擎：**[rdbende/Sun-Valley-ttk-theme: A gorgeous theme for ttk, based on Microsoft's Sun Valley visual styles ✨ (github.com)](https://github.com/rdbende/Sun-Valley-ttk-theme)
+**you-get：**[soimort/you-get](https://github.com/soimort/you-get)
 
-**you-get：**[soimort/you-get: Dumb downloader that scrapes the web (github.com)](https://github.com/soimort/you-get)
-
-**一键部署 you-get 支持：**[twlz0ne/you-get_install: 一键安装 you-get 到 windows (github.com)](https://github.com/twlz0ne/you-get_install)
+**一键部署 you-get 支持：**[twlz0ne/you-get_install](https://github.com/twlz0ne/you-get_install)
 
 由衷的感谢以上作者
 
