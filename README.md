@@ -6,6 +6,7 @@
 
 此项目基于 you-get 开发，调用终端向 you-get 发送命令以达到下载的效果。是为了帮助不使用 python 工具的人更方便的使用 you-get 这一下载神器
 如果对项目有任何疑问或者建议，欢迎加入QQ群：473542615
+
 ![image-20230114132520545](README.assets/you-get-tools群二维码.png)
 
 
