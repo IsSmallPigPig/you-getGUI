@@ -63,6 +63,11 @@ value.set("720P")
 # 指令
 cmd_var = StringVar()
 cmd_var.set("生成指令")
+
+# 保存路径
+save_path_var = StringVar()
+save_path_var.set("文件保存路径")
+
 # cookies路径
 cookiespath_var = StringVar()
 cookiespath_var.set("cookies 路径")
@@ -136,6 +141,7 @@ url_Entry = EntryWithPlaceholder(root, "视频下载链接")
 filename_Entry = EntryWithPlaceholder(root, "输出文件名称")
 # 文件保存路径输入框
 filepath_Entry = EntryWithPlaceholder(root, "文件保存路径")
+filepath_Entry.config(textvariable=save_path_var)
 # cookies路径输入框
 cookiespath_Entry = EntryWithPlaceholder(root, "cookies 路径")
 cookiespath_Entry.config(textvariable=cookiespath_var)
@@ -166,9 +172,9 @@ sockspassword_Entry = EntryWithPlaceholder(root, "PASSWORD")
 cmd_Entry = Entry(root, textvariable=cmd_var, state='disabled', foreground='grey')
 
 # 打开文件保存路径按钮
-opensavepath_Button = Button(root, text="打开文件存储路径")
+opensavepath_Button = Button(root, text="打开文件存储路径", command=t.save_path_command)
 # 打开 cookies 存储路径按钮
-opencookiespath_Button = Button(root, text="提交其他 cookies")
+opencookiespath_Button = Button(root, text="提交其他 cookies", command=t.open_cookies)
 # 确认信息按钮
 makesure_Button = Button(root, text="确认信息", command=t.makesure_command)
 # 开始下载按钮

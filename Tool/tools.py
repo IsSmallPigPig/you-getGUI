@@ -1,6 +1,7 @@
 import threading
 import tkinter
 import tkinter.ttk
+from tkinter import filedialog
 
 import Core.you_get as c
 import Tool.menu as m
@@ -16,6 +17,30 @@ fathe_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".")
 home = os.path.expanduser('~')
 # 是否通过检查
 flag = 1
+
+
+def save_path_command(*args):
+    """
+    实现打开目录操作
+    :param args:不用填形参
+    :return:返回用户打开的路径
+    """
+    open_save_path = filedialog.askdirectory(title='打开保存路径', initialdir=home)
+    print(open_save_path)
+    m.save_path_var.set(open_save_path)
+    return open_save_path
+
+
+def open_cookies(*arg):
+    """
+    上传 cookies 操作
+    :param arg:不用填形参
+    :return:用户选择的文件路径
+    """
+    cookies_file = filedialog.askopenfilename(title='打开 cookies 存储路径', initialdir=home)
+    print(cookies_file)
+    m.cookiespath_var.set(cookies_file)
+    return cookies_file
 
 
 def disabled_startdownload(check: tkinter.IntVar):
