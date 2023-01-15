@@ -2,9 +2,13 @@ import subprocess
 import tkinter.messagebox
 
 import Tool.menu as m
+import os
+
+# 获得用户主目录
+home = os.path.expanduser('~')
 
 # 指令列表
-cmd_list = ['you-get']
+cmd_list = ["you-get"]
 
 
 def video_url(url):
@@ -40,7 +44,7 @@ def download_video(*args):
     :param args:不用填形参
     :return: 返回执行结果
     """
-    run_cmd(cmd_list)
+    cmd_info = run_cmd(cmd_list)
     # 停止进度条
     m.progressbarOne.stop()
     # 显示对话框
@@ -48,25 +52,35 @@ def download_video(*args):
     # 解除禁用控件
     m.makesure_Button['state'] = 'active'
     m.combobox['state'] = 'readonly'
+    return cmd_info
 
 
-def info(url):
+def info(url, cookies=''):
     """
     获得视频清晰度等信息
     :param url: 视频网址
+    :param cookies: 可选cookies
     :return: 返回信息
     """
-    # print(run_cmd(['you-get', '-i', url]))
-    return run_cmd(['you-get', '-i', url])
+    print(cookies)
+    if cookies == '':
+        # print(run_cmd(["you-get", '-i', url]))
+        return run_cmd(["you-get", '-i', url])
+    else:
+        return run_cmd(["you-get", '-i', url, '-c', cookies])
 
 
-def get_url(url):
+def get_url(url, cookies=''):
     """
     获得解析出的url
     :param url: 视频网址
+    :param cookies: 非必填 cookies
     :return: 返回信息
     """
-    print(run_cmd(['you-get', '-u', url]))
+    if cookies == '':
+        return run_cmd(["you-get", '-u', url])
+    else:
+        return run_cmd(["you-get", '-u', url, '-c', cookies])
 
 
 def get_version(*args):
@@ -74,7 +88,7 @@ def get_version(*args):
     获得版本号
     :return: 返回版本号
     """
-    return run_cmd(['you-get', '-V'])
+    return run_cmd(["you-get", '-V'])
 
 
 def get_help(*args):
@@ -82,16 +96,20 @@ def get_help(*args):
     获得帮助
     :return: 返回帮助
     """
-    return run_cmd(['you-get', '-h'])
+    return run_cmd(["you-get", '-h'])
 
 
-def get_json(url: str):
+def get_json(url: str, cookies=''):
     """
     获得json
-    :param 网页链接
+    :param url: 网页链接
+    :param cookies: 可选 cookies
     :return: 返回json
     """
-    return run_cmd(['you-get', url, '--json'])
+    if cookies == '':
+        return run_cmd(["you-get", '--json', url])
+    else:
+        return run_cmd(["you-get", '--json', url, '-c', cookies])
 
 
 def no_merge(*args):
@@ -150,8 +168,7 @@ def stream_id(stream: str):
     :param stream:清晰度代码
     :return: 无返回值
     """
-    cmd_list.append('--format')
-    cmd_list.append(stream)
+    cmd_list.append('--format=%s' % stream)
     return None
 
 

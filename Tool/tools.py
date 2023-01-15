@@ -1,8 +1,9 @@
+import zipfile
+import shutil
+import requests
 import threading
-import tkinter
 import tkinter.ttk
 from tkinter import filedialog
-
 import Core.you_get as c
 import Tool.menu as m
 import os
@@ -12,79 +13,13 @@ from tkinter import messagebox
 
 # 获得父目录
 pwd = os.getcwd()
-fathe_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".")
+father_path = pwd
 # 获得用户主目录
 home = os.path.expanduser('~')
 # 是否通过检查
 flag = 1
-
-
-def save_path_command(*args):
-    """
-    实现打开目录操作
-    :param args:不用填形参
-    :return:返回用户打开的路径
-    """
-    open_save_path = filedialog.askdirectory(title='打开保存路径', initialdir=home)
-    print(open_save_path)
-    m.save_path_var.set(open_save_path)
-    return open_save_path
-
-
-def open_cookies(*arg):
-    """
-    上传 cookies 操作
-    :param arg:不用填形参
-    :return:用户选择的文件路径
-    """
-    cookies_file = filedialog.askopenfilename(title='打开 cookies 存储路径', initialdir=home)
-    print(cookies_file)
-    m.cookiespath_var.set(cookies_file)
-    return cookies_file
-
-
-def disabled_startdownload(check: tkinter.IntVar):
-    """
-    禁止启动下载操作
-    :param check: 检查按钮，以便获得状态
-    :return: 不返回值
-    """
-    if check.get() == 1:
-        m.downlaod_Button['state'] = 'disabled'
-    else:
-        m.downlaod_Button['state'] = 'active'
-
-
-def write(filename, string):
-    """
-    写入操作函数
-    :param filename: 文件路径
-    :param string: 写入内容
-    :return: 无返回值
-    """
-    with open(filename, 'w', encoding='utf-8') as file_object:
-        file_object.write(string)
-
-
-def load_json():
-    """
-    加载 json 文件
-    :return: 返回转换好的对象
-    """
-    with open('%s/Date/video_json.json' % fathe_path, 'r', encoding='utf-8') as f:
-        video_json = json.load(f)
-        print(video_json)
-        return video_json
-
-
-def download_json(url: str):
-    """
-    下载视频 json 到本地
-    :param url: 视频链接
-    :return: 无返回值
-    """
-    video_json = c.get_json(url)
-    write("%s/Date/video_json.json" % fathe_path, video_json)
+# 清晰度
+item = ''
 
 
 def set_cmd(*args):
@@ -124,6 +59,7 @@ def set_cmd(*args):
         result = messagebox.askquestion(message="默认以用户目录作为下载位置，是否继续")
         if result == "yes":
             v.SAVE_PATH = home
+            c.output_dir(v.SAVE_PATH)
         else:
             flag = 0
 
@@ -251,6 +187,12 @@ def set_cmd(*args):
         v.GET_INFORMATION = c.info(v.URL)
         m.downlaod_Button['state'] = 'disabled'
         m.output_cmd.insert('insert', v.GET_INFORMATION)
+        return None
+    elif m.getinformation_var.get() == 1 and v.COOKIES_PATH != '':
+        v.GET_INFORMATION = c.info(v.URL, cookies=v.COOKIES_PATH)
+        m.downlaod_Button['state'] = 'disabled'
+        m.output_cmd.insert('insert', v.GET_INFORMATION)
+        return None
     else:
         m.downlaod_Button['state'] = 'active'
 
@@ -259,6 +201,12 @@ def set_cmd(*args):
         v.GET_URL = c.get_url(v.URL)
         m.downlaod_Button['state'] = 'disabled'
         m.output_cmd.insert('insert', v.GET_URL)
+        return None
+    elif m.geturl_var.get() == 1 and v.COOKIES_PATH != '':
+        v.GET_URL = c.get_url(v.URL, cookies=v.COOKIES_PATH)
+        m.downlaod_Button['state'] = 'disabled'
+        m.output_cmd.insert('insert', v.GET_URL)
+        return None
     else:
         m.downlaod_Button['state'] = 'active'
 
@@ -267,14 +215,21 @@ def set_cmd(*args):
         v.GET_JSON = c.get_json(v.URL)
         m.downlaod_Button['state'] = 'disabled'
         m.output_cmd.insert('insert', v.GET_JSON)
+        return None
+    elif m.getjson_var.get() == 1 and v.COOKIES_PATH != '':
+        v.GET_JSON = c.get_json(v.URL, cookies=v.COOKIES_PATH)
+        m.downlaod_Button['state'] = 'disabled'
+        m.output_cmd.insert('insert', v.GET_JSON)
+        return None
     else:
         m.downlaod_Button['state'] = 'active'
 
     # 查看版本号
     if m.getversion_var.get() == 1:
-        v.GET_VERSION = c.get_json(v.URL)
+        v.GET_VERSION = c.get_version(v.URL)
         m.downlaod_Button['state'] = 'disabled'
         m.output_cmd.insert('insert', v.GET_VERSION)
+        return None
     else:
         m.downlaod_Button['state'] = 'active'
 
@@ -284,39 +239,210 @@ def set_cmd(*args):
     else:
         pass
 
+    # 下载json
+    write("%s/video_json.json" % home, c.get_json(v.URL, cookies=v.COOKIES_PATH))
+    get_json_stream("%s/video_json.json" % home)
+    # 获得所有键
+    v.STREAM_KEYS_LIST = list(v.STREAM_DICT.keys())
+    # 获得所有值
+    v.STREAM_VALUES_LIST = list(v.STREAM_DICT.values())
+    # 配置下拉框
+    m.combobox.config(values=v.STREAM_VALUES_LIST)
+
+
+def un_zip(zipath, filepath):
+    """
+    解压文件方法
+    :param zipath: 需要解压的文件
+    :param filepath: 解压后文件保存路径
+    :return:
+    """
+    with zipfile.ZipFile(zipath, 'r') as zf:
+        zf.extractall(filepath)
+
+
+def envirenment_tool(*args):
+    """
+    修复环境
+    :param args:不用填形参
+    :return: 不返回值
+    """
+    # 提示用户
+    messagebox.showinfo(title="注意事项",
+                        message="暂未完工的部分，如需修复环境，请将 you-get.exe 移动到用户主目录下")
+
+
+def makesure_thread(*args):
+    """
+    创建线程并防止多次创建
+    :param args: 不用填形参
+    :return: 不返回值
+    """
+    # 创建线程
+    makesure = threading.Thread(target=makesure_command, args='')
+
+    # 启动线程
+    if makesure.is_alive() is False:
+        makesure.start()
+
+    else:
+        pass
+
+
+def save_path_command(*args):
+    """
+    实现打开目录操作
+    :param args:不用填形参
+    :return:返回用户打开的路径
+    """
+    open_save_path = filedialog.askdirectory(title='打开保存路径', initialdir=home)
+    print(open_save_path)
+    m.save_path_var.set(open_save_path)
+    return open_save_path
+
+
+def open_cookies(*arg):
+    """
+    上传 cookies 操作
+    :param arg:不用填形参
+    :return:用户选择的文件路径
+    """
+    cookies_file = filedialog.askopenfilename(title='打开 cookies 存储路径', initialdir=home)
+    print(cookies_file)
+    m.cookiespath_var.set(cookies_file)
+    return cookies_file
+
+
+def combobox_commands(*args):
+    """
+    响应下拉框操作
+    :param args: 不填形参
+    :return: 不返回值
+    """
+
+    # 获得当前下拉框选项所对应的清晰度代码
+    v.STREAM_ID = v.STREAM_DICT_VK.get(m.combobox.get())
+    print(v.STREAM_ID)
+
+
+def disabled_startdownload(check: tkinter.IntVar):
+    """
+    禁止启动下载操作
+    :param check: 检查按钮，以便获得状态
+    :return: 不返回值
+    """
+    if check.get() == 1:
+        m.downlaod_Button['state'] = 'disabled'
+    else:
+        m.downlaod_Button['state'] = 'active'
+
+
+def write(filename, string):
+    """
+    写入操作函数
+    :param filename: 文件路径
+    :param string: 写入内容
+    :return: 无返回值
+    """
+    with open(filename, 'w', encoding='utf-8') as file_object:
+        file_object.write(string)
+
+
+def download_json(url: str):
+    """
+    下载视频 json 到本地
+    :param url: 视频链接
+    :return: 无返回值
+    """
+    video_json = c.get_json(url)
+    write("%s/video_json.json" % home, video_json)
+
+
+def load_json(json_path):
+    """
+    加载 json 文件
+    :return: 返回转换好的对象
+    """
+    with open(json_path, 'r', encoding='utf-8') as f:
+        video_json = json.load(f)
+        # print(video_json)
+        return video_json
+
+
+def get_json_stream(json_obj):
+    """
+    获得视频清晰度
+    :param json_obj: 要解析的json路径
+    :return: 返回清晰度列表
+    """
+    # 转为json对象
+    global item
+    try:
+        json_obj = load_json(json_obj)
+    except:
+        messagebox.showerror(title="链接错误",
+                             message="链接有误，请检查链接是否是 you-get 支持的网站或者链接是否填写正确")
+        return None
+
+    # 获得储存信息的streams
+    json_stream = json_obj["streams"]
+
+    # 读取
+    for item in json_stream:
+        # 获得清晰度中文的字典
+        v.STREAM_DICT[item] = json_stream[item]['quality']
+        # 获得便于查询的字典
+        v.STREAM_DICT_VK[json_stream[item]['quality']] = item
+    return v.STREAM_DICT
+
+
+def bilibili_stream(*args):
+    """
+    针对B站做的清晰度选择
+    :param args: 不用填形参
+    :return: 无返回值
+    """
+    print(father_path)
+    stream_id = get_json_stream("%s/video_json.json" % home)
+    # 获得所有值
+    items = []
+    for i in stream_id:
+        items.append(stream_id.get(i))
+    return items
+
 
 def makesure_command(*args):
     """
     确认信息
     :return: 无返回值
     """
+    # 传入真伪判断值
     global flag
-
     # 清空列表
-    c.cmd_list = ['you-get']
+    c.cmd_list = ["you-get"]
     # 创建确认信息线程
-    setcmd = threading.Thread(target=set_cmd())
-    # 启动确认信息线程
-    setcmd.start()
+    set_cmd()
 
+    # print(stream)
     if flag == 1:
         # 设置下拉框可用
         m.combobox['state'] = 'readonly'
         # 设置下载按钮可用
         m.downlaod_Button['state'] = 'active'
-        # 清除信息
-        v.CMD = ''
         # 获得指令内容
         v.CMD = c.get_cmd_information()
+        # 清除上次生成的指令
         m.cmd_var.set("生成指令")
-
         # 显示指令
         m.cmd_var.set(v.CMD)
 
     else:
-        flag = 1
-        c.cmd_list = ['you-get']
+        # 清空指令列表
+        c.cmd_list = ["you-get"]
+        # 清空显示指令框
         m.cmd_var.set("生成指令")
+        # 重置为能通过状态
+        flag = 1
 
 
 def download_command(*args):
@@ -332,16 +458,25 @@ def download_command(*args):
         :param args:不用填形参
         :return: 无返回值
         """
+        # 发送清晰度指令
+        c.stream_id(v.STREAM_ID)
+        # 发送下载指令
         cmd = c.download_video()
+
+        # 结束后显示下载结果
         m.output_cmd.insert('insert', cmd)
 
     # 下载过程中禁止调用
     m.makesure_Button['state'] = 'disabled'
     m.combobox['state'] = 'disabled'
 
+    # 启动进度条
     m.progressbarOne.start()
-    cmd_thread = threading.Thread(target=start_download)
-    cmd_thread.start()
+    # 创建开始下载操作的线程
+    cmd_thread = threading.Thread(target=start_download, args='')
+    if cmd_thread.is_alive() is False:  # 判断线程的状态
+        # 启动线程
+        cmd_thread.start()
 
 
 def get_firfox_cookie_path(*args):
@@ -366,4 +501,5 @@ def get_firfox_cookie_path(*args):
 
 
 if __name__ == '__main__':
+    shutil.move('Download', home)
     pass

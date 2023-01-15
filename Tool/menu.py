@@ -1,3 +1,4 @@
+import threading
 from tkinter.ttk import *
 from tkinter import IntVar, StringVar
 import Tool.tools as t
@@ -43,9 +44,13 @@ def progress_stop(*args):
     progressbarOne.stop()
 
 
+# 创建窗口
 root = tk.Tk()
+# 设置主题
 sv_ttk.set_theme('dark')
-root.geometry('810x900')
+# 设置窗口大小
+root.geometry('810x960')
+# 禁止缩放
 root.resizable(False, False)
 # 告诉操作系统使用程序自身的dpi适配
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
@@ -54,11 +59,9 @@ ScaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
 # 设置程序缩放
 root.tk.call('tk', 'scaling', ScaleFactor / 75)
 
-# 可选列表
-values = ['360P', '720P', '1080P']
 # 设定默认值
 value = StringVar()
-value.set("720P")
+value.set('流畅 360P')
 
 # 指令
 cmd_var = StringVar()
@@ -118,6 +121,7 @@ getversion_var.set(0)
 force_var = IntVar()
 force_var.set(0)
 
+
 # 基础设置文本框
 simple_Label = Label(text="基础设置", font=("微软雅黑", 12, "bold"))
 # 高级设置文本框
@@ -176,11 +180,13 @@ opensavepath_Button = Button(root, text="打开文件存储路径", command=t.sa
 # 打开 cookies 存储路径按钮
 opencookiespath_Button = Button(root, text="提交其他 cookies", command=t.open_cookies)
 # 确认信息按钮
-makesure_Button = Button(root, text="确认信息", command=t.makesure_command)
+makesure_Button = Button(root, text="确认信息", command=t.makesure_thread)
 # 开始下载按钮
 downlaod_Button = Button(root, text="开始下载", state='disabled', command=t.download_command)
 # 自动获得 cookies
 autogetcookies_Button = Button(root, text="自动获得火狐cookies", state='active', command=t.get_firfox_cookie_path)
+# 修复环境按钮
+envirenment_Button = Button(root, text="安装环境 & 修复环境", state='active', command=t.envirenment_tool)
 
 # m3u8 检查按钮
 m3u8_Check = Checkbutton(root, text='m3u8 视频', state='normal', variable=m3u8_var)
@@ -232,9 +238,10 @@ combobox = Combobox(
     cursor='arrow',  # 鼠标移动时样式 arrow, circle, cross, plus...
     font=('', 20),  # 字体
     textvariable=value,  # 通过StringVar设置可改变的值
-    values=values,  # 设置下拉框的选项
-    exportselection=False
+    values=v.STREAM_VALUES_LIST,  # 设置下拉框的选项
+    exportselection=False,
 )
+combobox.bind('<<ComboboxSelected>>', t.combobox_commands)
 
 # 绘制基础设置文本框
 simple_Label.place(x=10, y=20, width=80, height=25)
@@ -296,6 +303,8 @@ autogetcookies_Button.place(x=210, y=250, width=180, height=30)
 makesure_Button.place(x=10, y=470, width=790, height=30)
 # 绘制开始下载按钮
 downlaod_Button.place(x=10, y=630, width=790, height=30)
+# 绘制修复环境按钮
+envirenment_Button.place(x=10, y=700, width=790, height=30)
 
 # 绘制自动重命名检查按钮
 autorename_Check.place(x=10, y=300, width=110, height=30)
@@ -330,7 +339,9 @@ debug_Check.place(x=180, y=380, width=90, height=30)
 
 # 绘制进度条
 progressbarOne.place(x=10, y=670, width=790, height=20)
-output_cmd.place(x=10, y=700, width=790, height=190)
+
+# 绘制终端
+output_cmd.place(x=10, y=750, width=790, height=190)
 
 # 绘制下拉框
 combobox.place(x=10, y=550, width=790, height=30)
