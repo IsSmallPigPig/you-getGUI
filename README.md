@@ -136,6 +136,15 @@ Tool 是本项目的主体
 
 
 
+## 5 运行环境
+
+如果您要使用源码，请注意以下事项：
+
+- 如果您没有安装 you-get，请将源码目录下的 you-get 移动到 windows 目录下或者任何在 path 环境变量下的文件夹
+- 请下载 FFmpeg 到 windows 目录下或者任何在 path 环境变量下的文件夹
+
+
+
 ## 5 一些问题
 
 
@@ -143,6 +152,7 @@ Tool 是本项目的主体
 
 - 本项目不支持多语言
 - 本项目未解决实时显示终端信息
+- 本项目打包出来的程序效果不佳，与 pycharm 运行结果存在很大差异
 - 半成品状态
 
 
@@ -153,7 +163,7 @@ Tool 是本项目的主体
 
 **you-get：**[soimort/you-get](https://github.com/soimort/you-get)
 
-**一键部署 you-get 支持：**[twlz0ne/you-get_install](https://github.com/twlz0ne/you-get_install)
+**you-get 打包支持：**[https://github.com/LussacZheng/you-get.exe/](https://github.com/twlz0ne/you-get_install)
 
 由衷的感谢以上作者
 
