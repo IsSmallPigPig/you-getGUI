@@ -4,5 +4,3 @@ import Tool.menu as m
 if __name__ == '__main__':
     # m.messegerbox("1", "1")
     m.root.mainloop()
-
-

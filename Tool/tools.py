@@ -22,12 +22,19 @@ item = ''
 
 
 def set_cmd(*args):
-    global flag
     """
     准备指令
     :param args: 不需要填形参
     :return: 无返回值
     """
+    global flag
+
+    # 禁用下载按钮
+    m.download_Button['state'] = 'disabled'
+    # 禁用确认按钮
+    m.makesure_Button['state'] = 'disabled'
+    # 禁用下拉框
+    m.combobox['state'] = 'disabled'
 
     # 检查视频链接输入框是否有填写
     if m.url_Entry.get() != "" and m.url_Entry.get() != '视频下载链接':
@@ -184,80 +191,59 @@ def set_cmd(*args):
     # 获得信息
     if m.getinformation_var.get() == 1:
         v.GET_INFORMATION = c.info(v.URL)
-        m.downlaod_Button['state'] = 'disabled'
+        m.download_Button['state'] = 'disabled'
         m.output_cmd.insert('insert', v.GET_INFORMATION)
         return None
     elif m.getinformation_var.get() == 1 and v.COOKIES_PATH != '':
         v.GET_INFORMATION = c.info(v.URL, cookies=v.COOKIES_PATH)
-        m.downlaod_Button['state'] = 'disabled'
+        m.download_Button['state'] = 'disabled'
         m.output_cmd.insert('insert', v.GET_INFORMATION)
         return None
     else:
-        m.downlaod_Button['state'] = 'active'
+        m.download_Button['state'] = 'disabled'
 
     # 获得解析 url
     if m.geturl_var.get() == 1:
         v.GET_URL = c.get_url(v.URL)
-        m.downlaod_Button['state'] = 'disabled'
+        m.download_Button['state'] = 'disabled'
         m.output_cmd.insert('insert', v.GET_URL)
         return None
     elif m.geturl_var.get() == 1 and v.COOKIES_PATH != '':
         v.GET_URL = c.get_url(v.URL, cookies=v.COOKIES_PATH)
-        m.downlaod_Button['state'] = 'disabled'
+        m.download_Button['state'] = 'disabled'
         m.output_cmd.insert('insert', v.GET_URL)
         return None
     else:
-        m.downlaod_Button['state'] = 'active'
+        m.download_Button['state'] = 'disabled'
 
     # 获得解析 json
     if m.getjson_var.get() == 1:
         v.GET_JSON = c.get_json(v.URL)
-        m.downlaod_Button['state'] = 'disabled'
+        m.download_Button['state'] = 'disabled'
         m.output_cmd.insert('insert', v.GET_JSON)
         return None
     elif m.getjson_var.get() == 1 and v.COOKIES_PATH != '':
         v.GET_JSON = c.get_json(v.URL, cookies=v.COOKIES_PATH)
-        m.downlaod_Button['state'] = 'disabled'
+        m.download_Button['state'] = 'disabled'
         m.output_cmd.insert('insert', v.GET_JSON)
         return None
     else:
-        m.downlaod_Button['state'] = 'active'
+        m.download_Button['state'] = 'disabled'
 
     # 查看版本号
     if m.getversion_var.get() == 1:
         v.GET_VERSION = c.get_version(v.URL)
-        m.downlaod_Button['state'] = 'disabled'
+        m.download_Button['state'] = 'disabled'
         m.output_cmd.insert('insert', v.GET_VERSION)
         return None
     else:
-        m.downlaod_Button['state'] = 'active'
+        m.download_Button['state'] = 'disabled'
 
     # 是否覆盖重名文件
     if m.getjson_var.get() == 1:
         c.force()
     else:
         pass
-
-    # 下载json
-    write("%s/video_json.json" % home, c.get_json(v.URL, cookies=v.COOKIES_PATH))
-    get_json_stream("%s/video_json.json" % home)
-    # 获得所有键
-    v.STREAM_KEYS_LIST = list(v.STREAM_DICT.keys())
-    # 获得所有值
-    v.STREAM_VALUES_LIST = list(v.STREAM_DICT.values())
-    # 配置下拉框
-    m.combobox.config(values=v.STREAM_VALUES_LIST)
-
-
-def un_zip(zipath, filepath):
-    """
-    解压文件方法
-    :param zipath: 需要解压的文件
-    :param filepath: 解压后文件保存路径
-    :return:
-    """
-    with zipfile.ZipFile(zipath, 'r') as zf:
-        zf.extractall(filepath)
 
 
 def envirenment_tool(*args):
@@ -268,7 +254,8 @@ def envirenment_tool(*args):
     """
     # 提示用户
     messagebox.showinfo(title="注意事项",
-                        message="暂未完工的部分，如需修复环境，请将 you-get.exe 移动到用户主目录下")
+                        message="该方法将会移动 you-get.exe 到用户目录下")
+    shutil.move("you-get.exe", home)
 
 
 def makesure_thread(*args):
@@ -331,9 +318,9 @@ def disabled_startdownload(check: tkinter.IntVar):
     :return: 不返回值
     """
     if check.get() == 1:
-        m.downlaod_Button['state'] = 'disabled'
+        m.download_Button['state'] = 'disabled'
     else:
-        m.downlaod_Button['state'] = 'active'
+        m.download_Button['state'] = 'disabled'
 
 
 def write(filename, string):
@@ -418,30 +405,50 @@ def makesure_command(*args):
     # 传入真伪判断值
     global flag
     # 清空列表
-    c.cmd_list = ["you-get"]
-    # 创建确认信息线程
+    c.cmd_list = ["%s/you-get.exe" % home]
     set_cmd()
-
-    # print(stream)
     if flag == 1:
-        # 设置下拉框可用
+        print("通过")
+        # 下载json
+        write("%s/video_json.json" % home, c.get_json(v.URL, cookies=v.COOKIES_PATH))
+        get_json_stream("%s/video_json.json" % home)
+        # 获得所有键
+        v.STREAM_KEYS_LIST = list(v.STREAM_DICT.keys())
+        # 获得所有值
+        v.STREAM_VALUES_LIST = list(v.STREAM_DICT.values())
+        # 配置下拉框
+        m.combobox.config(values=v.STREAM_VALUES_LIST)
+
+        # 启用
+        m.download_Button['state'] = 'active'
+        # 启用
+        m.makesure_Button['state'] = 'active'
+        # 启用
         m.combobox['state'] = 'readonly'
-        # 设置下载按钮可用
-        m.downlaod_Button['state'] = 'active'
+
+        # 设置下拉框可用
+        # m.combobox['state'] = 'readonly'
+        # 设置下载按钮不可用
+        # m.downlaod_Button['state'] = 'disabled'
         # 获得指令内容
         v.CMD = c.get_cmd_information()
         # 清除上次生成的指令
         m.cmd_var.set("生成指令")
         # 显示指令
         m.cmd_var.set(v.CMD)
+        # 设置下载按钮可用
+        # m.downlaod_Button['state'] = 'active'
 
     else:
-        # 清空指令列表
-        c.cmd_list = ["you-get"]
+        print("未通过")
         # 清空显示指令框
         m.cmd_var.set("生成指令")
+        # 禁用下载按钮
+        m.download_Button['state'] = 'disabled'
         # 重置为能通过状态
         flag = 1
+        # 启用
+        m.makesure_Button['state'] = 'active'
 
 
 def download_command(*args):

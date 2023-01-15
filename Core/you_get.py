@@ -8,7 +8,7 @@ import os
 home = os.path.expanduser('~')
 
 # 指令列表
-cmd_list = ["you-get"]
+cmd_list = ["%s/you-get.exe" % home]
 
 
 def video_url(url):
@@ -64,10 +64,10 @@ def info(url, cookies=''):
     """
     print(cookies)
     if cookies == '':
-        # print(run_cmd(["you-get", '-i', url]))
-        return run_cmd(["you-get", '-i', url])
+        # print(run_cmd(["%s/you-get.exe" % home, '-i', url]))
+        return run_cmd(["%s/you-get.exe" % home, '-i', url])
     else:
-        return run_cmd(["you-get", '-i', url, '-c', cookies])
+        return run_cmd(["%s/you-get.exe" % home, '-i', url, '-c', cookies])
 
 
 def get_url(url, cookies=''):
@@ -78,9 +78,9 @@ def get_url(url, cookies=''):
     :return: 返回信息
     """
     if cookies == '':
-        return run_cmd(["you-get", '-u', url])
+        return run_cmd(["%s/you-get.exe" % home, '-u', url])
     else:
-        return run_cmd(["you-get", '-u', url, '-c', cookies])
+        return run_cmd(["%s/you-get.exe" % home, '-u', url, '-c', cookies])
 
 
 def get_version(*args):
@@ -88,7 +88,7 @@ def get_version(*args):
     获得版本号
     :return: 返回版本号
     """
-    return run_cmd(["you-get", '-V'])
+    return run_cmd(["%s/you-get.exe" % home, '-V'])
 
 
 def get_help(*args):
@@ -96,7 +96,7 @@ def get_help(*args):
     获得帮助
     :return: 返回帮助
     """
-    return run_cmd(["you-get", '-h'])
+    return run_cmd(["%s/you-get.exe" % home, '-h'])
 
 
 def get_json(url: str, cookies=''):
@@ -107,9 +107,9 @@ def get_json(url: str, cookies=''):
     :return: 返回json
     """
     if cookies == '':
-        return run_cmd(["you-get", '--json', url])
+        return run_cmd(["%s/you-get.exe" % home, '--json', url])
     else:
-        return run_cmd(["you-get", '--json', url, '-c', cookies])
+        return run_cmd(["%s/you-get.exe" % home, '--json', url, '-c', cookies])
 
 
 def no_merge(*args):

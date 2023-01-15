@@ -1,3 +1,5 @@
+import base64
+import os
 from tkinter.ttk import *
 from tkinter import IntVar, StringVar
 import Tool.tools as t
@@ -59,6 +61,10 @@ ScaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
 root.call('tk', 'scaling', ScaleFactor / 75)
 # 设置缩放因子
 root.tk.call('tk', 'scaling', ScaleFactor / 75)
+# 设置窗口标题
+root.title("视频下载工具")
+# 设置图标
+root.iconbitmap('icon.ico')
 
 # 设定默认值
 value = StringVar()
@@ -182,7 +188,7 @@ opencookiespath_Button = Button(root, text="提交其他 cookies", command=t.ope
 # 确认信息按钮
 makesure_Button = Button(root, text="确认信息", command=t.makesure_thread)
 # 开始下载按钮
-downlaod_Button = Button(root, text="开始下载", state='disabled', command=t.download_command)
+download_Button = Button(root, text="开始下载", state='disabled', command=t.download_command)
 # 自动获得 cookies
 autogetcookies_Button = Button(root, text="自动获得火狐cookies", state='active', command=t.get_firfox_cookie_path)
 # 修复环境按钮
@@ -302,7 +308,7 @@ autogetcookies_Button.place(x=210, y=250, width=180, height=30)
 # 绘制确认信息按钮
 makesure_Button.place(x=10, y=470, width=790, height=30)
 # 绘制开始下载按钮
-downlaod_Button.place(x=10, y=630, width=790, height=30)
+download_Button.place(x=10, y=630, width=790, height=30)
 # 绘制修复环境按钮
 envirenment_Button.place(x=10, y=700, width=790, height=30)
 
