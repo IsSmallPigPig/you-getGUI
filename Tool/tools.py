@@ -1,6 +1,5 @@
 import zipfile
 import shutil
-import requests
 import threading
 import tkinter.ttk
 from tkinter import filedialog

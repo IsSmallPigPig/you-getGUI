@@ -1,4 +1,3 @@
-import threading
 from tkinter.ttk import *
 from tkinter import IntVar, StringVar
 import Tool.tools as t
@@ -52,11 +51,13 @@ sv_ttk.set_theme('dark')
 root.geometry('810x960')
 # 禁止缩放
 root.resizable(False, False)
-# 告诉操作系统使用程序自身的dpi适配
+# 调用api设置成由应用程序缩放
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
-# 获取屏幕的缩放因子
+# 调用api获得当前的缩放因子
 ScaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
-# 设置程序缩放
+# 设置缩放因子
+root.call('tk', 'scaling', ScaleFactor / 75)
+# 设置缩放因子
 root.tk.call('tk', 'scaling', ScaleFactor / 75)
 
 # 设定默认值
@@ -120,7 +121,6 @@ getversion_var.set(0)
 # 是否覆盖重名文件
 force_var = IntVar()
 force_var.set(0)
-
 
 # 基础设置文本框
 simple_Label = Label(text="基础设置", font=("微软雅黑", 12, "bold"))
