@@ -4,5 +4,5 @@ setuptools==65.7.0
 sv-ttk==2.4
 ttkbootstrap==1.10.0
 wheel==0.38.4
-
+pysocks
 requests~=2.28.2

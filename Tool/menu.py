@@ -1,5 +1,3 @@
-import base64
-import os
 from tkinter.ttk import *
 from tkinter import IntVar, StringVar
 import Tool.tools as t
@@ -7,6 +5,7 @@ import Tool.constants as v
 import tkinter as tk
 import sv_ttk
 import ctypes
+import platform
 
 
 class EntryWithPlaceholder(Entry):
@@ -53,18 +52,22 @@ sv_ttk.set_theme('dark')
 root.geometry('810x960')
 # 禁止缩放
 root.resizable(False, False)
-# 调用api设置成由应用程序缩放
-ctypes.windll.shcore.SetProcessDpiAwareness(1)
-# 调用api获得当前的缩放因子
-ScaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
-# 设置缩放因子
-root.call('tk', 'scaling', ScaleFactor / 75)
-# 设置缩放因子
-root.tk.call('tk', 'scaling', ScaleFactor / 75)
+
+if 'Windows' == platform.system():
+    # 调用api设置成由应用程序缩放
+    ctypes.windll.shcore.SetProcessDpiAwareness(1)
+    # 调用api获得当前的缩放因子
+    ScaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
+    # 设置缩放因子
+    root.call('tk', 'scaling', ScaleFactor / 75)
+    # 设置缩放因子
+    root.tk.call('tk', 'scaling', ScaleFactor / 75)
+    
 # 设置窗口标题
 root.title("视频下载工具")
 # 设置图标
 root.iconbitmap('icon.ico')
+
 
 # 设定默认值
 value = StringVar()
@@ -129,21 +132,21 @@ force_var = IntVar()
 force_var.set(0)
 
 # 基础设置文本框
-simple_Label = Label(text="基础设置", font=("微软雅黑", 12, "bold"))
+simple_Label = Label(text="基础设置")
 # 高级设置文本框
-ununsual_Label = Label(text="高级设置", font=("微软雅黑", 12, "bold"))
+ununsual_Label = Label(text="高级设置")
 # 多P下载文本框
 # playlist_Label = Label(text="多P下载设置（全部下载不填）", font=("微软雅黑", 12, "bold"))
 # 按页下载文本框
 # pagesize_Label = Label(text="按页下载设置", font=("微软雅黑", 12, "bold"))
 # http代理设置文本框
-http_Label = Label(text="http 代理设置", font=("微软雅黑", 12, "bold"))
+http_Label = Label(text="http 代理设置")
 # socks代理设置文本框
-socks_Label = Label(text="Socks5 代理设置", font=("微软雅黑", 12, "bold"))
+socks_Label = Label(text="Socks5 代理设置")
 # 其他选项文本框
-other_Label = Label(text="其他设置", font=("微软雅黑", 12, "bold"))
+other_Label = Label(text="其他设置")
 # 下载属性文本框
-downloadconfig_Label = Label(text="下载属性", font=("微软雅黑", 12, "bold"))
+downloadconfig_Label = Label(text="下载属性")
 
 # 视频下载链接输入框
 url_Entry = EntryWithPlaceholder(root, "视频下载链接")
@@ -315,7 +318,7 @@ envirenment_Button.place(x=10, y=700, width=790, height=30)
 # 绘制自动重命名检查按钮
 autorename_Check.place(x=10, y=300, width=110, height=30)
 # 绘制覆盖重名文件检查按钮
-force_Check.place(x=140, y=300, width=140, height=30)
+force_Check.place(x=270, y=300, width=140, height=30)
 # 绘制下载多P视频检查按钮
 # playlist_Check.place(x=160, y=300, width=110, height=30)
 # 绘制不下载字幕检查按钮

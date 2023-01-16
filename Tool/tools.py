@@ -1,4 +1,4 @@
-import zipfile
+import requests
 import shutil
 import threading
 import tkinter.ttk
@@ -19,6 +19,78 @@ home = os.path.expanduser('~')
 flag = 1
 # 清晰度
 item = ''
+
+
+def check_http_proxy(ip, port):
+    """
+    验证代理有效性
+    :param port: 端口
+    :param ip: 主机
+    :return: 返回真假
+    """
+    import requests
+
+    proxies = {'http': '%s:%s' % (ip, port),
+               'https': '%s:%s' % (ip, port),
+               }
+    url = "http://www.baidu.com/"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
+    }
+    try:
+        response = requests.get(url, headers=headers, proxies=proxies, timeout=5)
+        print(response.text)
+    except Exception as e:
+        print(f"请求失败，代理IP无效！{e}")
+        return 0
+    else:
+        print("请求成功，代理IP有效！")
+        return 1
+
+
+def check_socks5_proxy(ip, port, username, password):
+    """
+    验证 socks5 代理是否有效
+    :param ip: 主机
+    :param port: 端口
+    :param username: 用户名
+    :param password: 密码
+    :return: 返回真假
+    """
+    if ip != '' and port != '':
+        try:
+            # requests.get('http://www.baidu.com/', proxies={"http":"http://"+ip+':'+port},timeout=2)
+            # session = Session()
+            proxy = {
+                "http": "socks5://" + ip + ':' + port,
+                "https": "socks5://" + ip + ':' + port
+            }
+            url = "http://www.baidu.com/"
+            req = requests.get(url, proxies=proxy)
+            print(req)
+
+        except:
+            print('connect failed')
+            return 0
+        else:
+            return 1
+    elif ip != '' and port != '' and username != '' and password != '':
+        try:
+            # requests.get('http://www.baidu.com/', proxies={"http":"http://"+ip+':'+port},timeout=2)
+            # session = Session()
+            proxy = {
+                "http": "socks5://" + ip + ':' + port + "@" + username + ":" + password,
+                "https": "socks5://" + ip + ':' + port + "@" + username + ":" + password,
+            }
+            url = "http://www.baidu.com/"
+            req = requests.get(url, proxies=proxy)
+            print(req)
+
+        except:
+            print('connect failed')
+            return 0
+        else:
+            return 1
 
 
 def set_cmd(*args):
@@ -45,6 +117,7 @@ def set_cmd(*args):
     else:
         messagebox.showerror(message="请输入视频链接")
         flag = 0
+        return None
 
     # 检查输出文件名称输入框是否有填写
     if m.filename_Entry.get() != "" and m.filename_Entry.get() != '输出文件名称':
@@ -68,6 +141,7 @@ def set_cmd(*args):
             c.output_dir(v.SAVE_PATH)
         else:
             flag = 0
+            return None
 
     # 检查cookies保存路径输入框是否有填写
     if m.cookiespath_Entry.get() != "" and m.cookiespath_Entry.get() != 'cookies 路径':
@@ -82,6 +156,7 @@ def set_cmd(*args):
             pass
         else:
             flag = 0
+            return None
 
     # 检查指定播放器输入框是否有填写
     if m.player_Entry.get() != "" and m.player_Entry.get() != '指定播放链接视频的本地播放器':
@@ -106,8 +181,18 @@ def set_cmd(*args):
         # 设为常量
         v.HTTP_HOST = m.httphost_Entry.get()
         v.HTTP_PORT = m.httpport_Entry.get()
-        # 填入http
-        c.http_proxy(v.HTTP_HOST, v.HTTP_PORT)
+        # 检查代理有效性
+        flag = check_http_proxy(v.HTTP_HOST, v.HTTP_PORT)
+
+        if flag == 1:
+            # 填入http
+            c.http_proxy(v.HTTP_HOST, v.HTTP_PORT)
+
+            check_http_proxy(v.HTTP_HOST, v.HTTP_PORT)
+
+        else:
+            messagebox.showerror(title="代理无效", message="请检查代理是否有效")
+
     else:
         pass
 
@@ -115,21 +200,31 @@ def set_cmd(*args):
             and m.socksport_Entry.get() != 'PORT' and m.socksusername_Entry.get() != "" \
             and m.socksusername_Entry.get() != 'USERNAME' and m.sockspassword_Entry.get() != "" \
             and m.sockspassword_Entry.get() != 'PASSWORD':
+
         # 设为常量
         v.SOCKS_HOST = m.sockshost_Entry.get()
         v.SOCKS_PORT = m.socksport_Entry.get()
         v.SOCKS_USERNAME = m.socksusername_Entry.get()
         v.SOCKS_PASSWORD = m.sockspassword_Entry.get()
-        # 填入socks
-        c.socks5_up(v.SOCKS_HOST, v.SOCKS_PORT, v.SOCKS_USERNAME, v.SOCKS_PASSWORD)
+        # 验证代理
+        flag = check_socks5_proxy(v.SOCKS_HOST, v.SOCKS_PORT, v.SOCKS_USERNAME, v.SOCKS_PASSWORD)
+
+        if flag == 1:
+            # 填入socks
+            c.socks5_up(v.SOCKS_HOST, v.SOCKS_PORT, v.SOCKS_USERNAME, v.SOCKS_PASSWORD)
+        else:
+            messagebox.showerror("代理无效", '请检查 socks5 代理是否正确填写')
 
     # 检查socks_host输入框是否有填写
     elif m.sockshost_Entry.get() != "" and m.sockshost_Entry.get() != 'HOST' and m.socksport_Entry.get() != "" and m.socksport_Entry.get() != 'PORT':
         # 设为常量
         v.SOCKS_HOST = m.sockshost_Entry.get()
         v.SOCKS_PORT = m.socksport_Entry.get()
-        # 填入socks
-        c.socks5_hp(v.SOCKS_HOST, v.SOCKS_PORT)
+        if flag == 1:
+            # 填入socks
+            c.socks5_hp(v.SOCKS_HOST, v.SOCKS_PORT)
+        else:
+            messagebox.showerror("代理无效", '请检查 socks5 代理是否正确填写')
 
     else:
         pass
@@ -255,7 +350,15 @@ def envirenment_tool(*args):
     # 提示用户
     messagebox.showinfo(title="注意事项",
                         message="该方法将会移动 you-get.exe 到用户目录下")
-    shutil.move("you-get.exe", home)
+    try:
+        shutil.copy("you-get.exe", home)
+    except Exception as E:
+        # 提示用户
+        messagebox.showerror(title="错误",
+                             message="可能您已执行过此命令")
+        os.remove(r"%s\you-get.exe" % home)
+        shutil.copy("you-get.exe", home)
+        print(E)
 
 
 def makesure_thread(*args):
@@ -365,10 +468,12 @@ def get_json_stream(json_obj):
     global item
     try:
         json_obj = load_json(json_obj)
+        return 1
     except:
         messagebox.showerror(title="链接错误",
                              message="链接有误，请检查链接是否是 you-get 支持的网站或者链接是否填写正确")
-        return None
+        m.download_Button['state'] = 'disabled'
+        return 0
 
     # 获得储存信息的streams
     json_stream = json_obj["streams"]
@@ -405,39 +510,42 @@ def makesure_command(*args):
     # 传入真伪判断值
     global flag
     # 清空列表
-    c.cmd_list = ["%s/you-get.exe" % home]
+    c.cmd_list = ["%s/you-get" % home]
     set_cmd()
     if flag == 1:
         print("通过")
         # 下载json
         write("%s/video_json.json" % home, c.get_json(v.URL, cookies=v.COOKIES_PATH))
-        get_json_stream("%s/video_json.json" % home)
-        # 获得所有键
-        v.STREAM_KEYS_LIST = list(v.STREAM_DICT.keys())
-        # 获得所有值
-        v.STREAM_VALUES_LIST = list(v.STREAM_DICT.values())
-        # 配置下拉框
-        m.combobox.config(values=v.STREAM_VALUES_LIST)
+        flag_json = get_json_stream("%s/video_json.json" % home)
+        if flag_json == 1:
+            # 获得所有键
+            v.STREAM_KEYS_LIST = list(v.STREAM_DICT.keys())
+            # 获得所有值
+            v.STREAM_VALUES_LIST = list(v.STREAM_DICT.values())
+            # 配置下拉框
+            m.combobox.config(values=v.STREAM_VALUES_LIST)
 
-        # 启用
-        m.download_Button['state'] = 'active'
-        # 启用
-        m.makesure_Button['state'] = 'active'
-        # 启用
-        m.combobox['state'] = 'readonly'
+            # 启用
+            m.download_Button['state'] = 'active'
+            # 启用
+            m.makesure_Button['state'] = 'active'
+            # 启用
+            m.combobox['state'] = 'readonly'
 
-        # 设置下拉框可用
-        # m.combobox['state'] = 'readonly'
-        # 设置下载按钮不可用
-        # m.downlaod_Button['state'] = 'disabled'
-        # 获得指令内容
-        v.CMD = c.get_cmd_information()
-        # 清除上次生成的指令
-        m.cmd_var.set("生成指令")
-        # 显示指令
-        m.cmd_var.set(v.CMD)
-        # 设置下载按钮可用
-        # m.downlaod_Button['state'] = 'active'
+            # 设置下拉框可用
+            # m.combobox['state'] = 'readonly'
+            # 设置下载按钮不可用
+            # m.downlaod_Button['state'] = 'disabled'
+            # 获得指令内容
+            v.CMD = c.get_cmd_information()
+            # 清除上次生成的指令
+            m.cmd_var.set("生成指令")
+            # 显示指令
+            m.cmd_var.set(v.CMD)
+            # 设置下载按钮可用
+            # m.downlaod_Button['state'] = 'active'
+        else:
+            return None
 
     else:
         print("未通过")
