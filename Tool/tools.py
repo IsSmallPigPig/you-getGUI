@@ -145,15 +145,20 @@ def set_cmd(*args):
 
     # 检查cookies保存路径输入框是否有填写
     if m.cookiespath_Entry.get() != "" and m.cookiespath_Entry.get() != 'cookies 路径':
+        print(v.COOKIES_PATH)
         # 设为常量
         v.COOKIES_PATH = m.cookiespath_Entry.get()
         # 填入cookies位置
         c.cookies_file(v.COOKIES_PATH)
+        print(v.COOKIES_PATH)
     else:
         result = messagebox.askquestion(message="未填写 cookies 将无法下载会员和高清视频，是否继续")
         print(result)
+        print(v.COOKIES_PATH)
+
         if result == "yes":
-            pass
+            # 设为常量
+            v.COOKIES_PATH = ''
         else:
             flag = 0
             return None
@@ -339,27 +344,12 @@ def set_cmd(*args):
         c.force()
     else:
         pass
-
-
-def envirenment_tool(*args):
-    """
-    修复环境
-    :param args:不用填形参
-    :return: 不返回值
-    """
-    # 提示用户
-    messagebox.showinfo(title="注意事项",
-                        message="该方法将会移动 you-get.exe 到用户目录下")
-    try:
-        shutil.copy("you-get.exe", home)
-    except Exception as E:
-        # 提示用户
-        messagebox.showerror(title="错误",
-                             message="可能您已执行过此命令")
-        os.remove(r"%s\you-get.exe" % home)
-        shutil.copy("you-get.exe", home)
-        print(E)
-
+    # 启用下载按钮
+    m.download_Button['state'] = 'active'
+    # 启用确认按钮
+    m.makesure_Button['state'] = 'active'
+    # 启用下拉框
+    m.combobox['state'] = 'active'
 
 def makesure_thread(*args):
     """
@@ -468,23 +458,22 @@ def get_json_stream(json_obj):
     global item
     try:
         json_obj = load_json(json_obj)
+        # 获得储存信息的streams
+        json_stream = json_obj["streams"]
+
+        # 读取
+        for item in json_stream:
+            # 获得清晰度中文的字典
+            v.STREAM_DICT[item] = json_stream[item]['quality']
+            # 获得便于查询的字典
+            v.STREAM_DICT_VK[json_stream[item]['quality']] = item
         return 1
     except:
         messagebox.showerror(title="链接错误",
                              message="链接有误，请检查链接是否是 you-get 支持的网站或者链接是否填写正确")
-        m.download_Button['state'] = 'disabled'
         return 0
 
-    # 获得储存信息的streams
-    json_stream = json_obj["streams"]
 
-    # 读取
-    for item in json_stream:
-        # 获得清晰度中文的字典
-        v.STREAM_DICT[item] = json_stream[item]['quality']
-        # 获得便于查询的字典
-        v.STREAM_DICT_VK[json_stream[item]['quality']] = item
-    return v.STREAM_DICT
 
 
 def bilibili_stream(*args):
@@ -522,6 +511,8 @@ def makesure_command(*args):
             v.STREAM_KEYS_LIST = list(v.STREAM_DICT.keys())
             # 获得所有值
             v.STREAM_VALUES_LIST = list(v.STREAM_DICT.values())
+            print(v.STREAM_VALUES_LIST)
+            print(v.COOKIES_PATH)
             # 配置下拉框
             m.combobox.config(values=v.STREAM_VALUES_LIST)
 
@@ -609,11 +600,10 @@ def get_firfox_cookie_path(*args):
         cookie_fold_index = folds_end.index('default')
     cookie_fold = folds_arr[cookie_fold_index]
     cookie_path = os.path.join(cookiepath_common, cookie_fold)
-    v.COOKIES_PATH = os.path.join(cookie_path, 'cookies.sqlite')
-    m.cookiespath_var.set(v.COOKIES_PATH)
+    # v.COOKIES_PATH = os.path.join(cookie_path, 'cookies.sqlite')
+    m.cookiespath_var.set(os.path.join(cookie_path, 'cookies.sqlite'))
     return os.path.join(cookie_path, 'cookies.sqlite')
 
 
 if __name__ == '__main__':
     shutil.move('Download', home)
-    pass

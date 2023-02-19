@@ -47,9 +47,9 @@ def progress_stop(*args):
 # 创建窗口
 root = tk.Tk()
 # 设置主题
-sv_ttk.set_theme('dark')
+sv_ttk.set_theme('light')
 # 设置窗口大小
-root.geometry('810x960')
+root.geometry('810x900')
 # 禁止缩放
 root.resizable(False, False)
 
@@ -71,7 +71,7 @@ root.iconbitmap('icon.ico')
 
 # 设定默认值
 value = StringVar()
-value.set('流畅 360P')
+# value.set('流畅 360P')
 
 # 指令
 cmd_var = StringVar()
@@ -159,13 +159,6 @@ filepath_Entry.config(textvariable=save_path_var)
 cookiespath_Entry = EntryWithPlaceholder(root, "cookies 路径")
 cookiespath_Entry.config(textvariable=cookiespath_var)
 
-# 起始集数输入框
-# start_Entry = EntryWithPlaceholder(root, "起始集数")
-# 结束集数输入框
-# last_Entry = EntryWithPlaceholder(root, "结束集数")
-# 下载页数字输入框
-# pagenumber_Entry = EntryWithPlaceholder(root, "下载页数字（第几页）")
-# 指定播放器输入框
 player_Entry = EntryWithPlaceholder(root, "指定播放链接视频的本地播放器")
 # 套接字延时输入框
 second_Entry = EntryWithPlaceholder(root, "套接字延时")
@@ -194,8 +187,6 @@ makesure_Button = Button(root, text="确认信息", command=t.makesure_thread)
 download_Button = Button(root, text="开始下载", state='disabled', command=t.download_command)
 # 自动获得 cookies
 autogetcookies_Button = Button(root, text="自动获得火狐cookies", state='active', command=t.get_firfox_cookie_path)
-# 修复环境按钮
-envirenment_Button = Button(root, text="安装环境 & 修复环境", state='active', command=t.envirenment_tool)
 
 # m3u8 检查按钮
 m3u8_Check = Checkbutton(root, text='m3u8 视频', state='normal', variable=m3u8_var)
@@ -236,7 +227,7 @@ skipSSL_Check = Checkbutton(root, text='忽略SSL错误', state='normal', variab
 progressbarOne = Progressbar(root, length=600, mode='indeterminate', orient=tk.HORIZONTAL)
 
 # 终端
-output_cmd = tk.Text(root, bd=2, relief='flat', highlightthickness=1, highlightcolor='#57c8ff')
+output_cmd = tk.Text(root, bd=2, relief='flat', highlightthickness=2, highlightcolor='#005fb8', highlightbackground='#005fb8', background='#f2f2f7')
 
 # 下拉框
 combobox = Combobox(
@@ -256,10 +247,6 @@ combobox.bind('<<ComboboxSelected>>', t.combobox_commands)
 simple_Label.place(x=10, y=20, width=80, height=25)
 # 绘制高级设置文本框
 ununsual_Label.place(x=410, y=20, width=80, height=25)
-# 绘制多P下载文本框
-# playlist_Label.place(x=10, y=330, width=280, height=25)
-# 绘制按页下载文本框
-# pagesize_Label.place(x=10, y=400, width=260, height=25)
 # 绘制 http文本框
 http_Label.place(x=410, y=130, width=280, height=25)
 # 绘制 socks 文本框
@@ -277,12 +264,6 @@ filename_Entry.place(x=10, y=90, width=380, height=30)
 filepath_Entry.place(x=10, y=130, width=380, height=30)
 # 绘制cookies路径输入框
 cookiespath_Entry.place(x=10, y=210, width=380, height=30)
-# 绘制起始集数输入框
-# start_Entry.place(x=10, y=360, width=180, height=30)
-# 绘制结束集数输入框
-# last_Entry.place(x=210, y=360, width=180, height=30)
-# 绘制下载页数字输入框
-# pagenumber_Entry.place(x=10, y=430, width=380, height=30)
 # 绘制指定视频播放器输入框
 player_Entry.place(x=410, y=50, width=380, height=30)
 # 绘制套接字延时输入框
@@ -312,15 +293,11 @@ autogetcookies_Button.place(x=210, y=250, width=180, height=30)
 makesure_Button.place(x=10, y=470, width=790, height=30)
 # 绘制开始下载按钮
 download_Button.place(x=10, y=630, width=790, height=30)
-# 绘制修复环境按钮
-envirenment_Button.place(x=10, y=700, width=790, height=30)
 
 # 绘制自动重命名检查按钮
 autorename_Check.place(x=10, y=300, width=110, height=30)
 # 绘制覆盖重名文件检查按钮
 force_Check.place(x=270, y=300, width=140, height=30)
-# 绘制下载多P视频检查按钮
-# playlist_Check.place(x=160, y=300, width=110, height=30)
 # 绘制不下载字幕检查按钮
 nocaption_Check.place(x=490, y=380, width=120, height=30)
 # 绘制不校验文件检查按钮
@@ -341,16 +318,13 @@ getversion_Check.place(x=650, y=420, width=90, height=30)
 m3u8_Check.place(x=10, y=380, width=110, height=30)
 # 绘制调试检查按钮
 debug_Check.place(x=180, y=380, width=90, height=30)
-# 绘制按页下载检查按钮
-# pagesize_Check.place(x=190, y=300, width=90, height=30)
-# 绘制忽略SSL错误检查按钮
-# skipSSL_Check.place(x=280, y=300, width=90, height=30)
+debug_Check.place(x=180, y=380, width=90, height=30)
 
 # 绘制进度条
 progressbarOne.place(x=10, y=670, width=790, height=20)
 
 # 绘制终端
-output_cmd.place(x=10, y=750, width=790, height=190)
+output_cmd.place(x=10, y=700, width=790, height=190)
 
 # 绘制下拉框
 combobox.place(x=10, y=550, width=790, height=30)
