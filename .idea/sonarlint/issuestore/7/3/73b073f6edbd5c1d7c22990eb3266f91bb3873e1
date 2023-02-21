@@ -1,14 +1,13 @@
 
-gpython:S1192A"JDefine a constant instead of duplicating this literal "socks5://" 4 times.(Ë¬ÿ¾ÿÿÿÿÿ
-npython:S1192$"VDefine a constant instead of duplicating this literal "http://www.baidu.com/" 3 times.(†­Õç
-qpython:S1192µ"SDefine a constant instead of duplicating this literal "%s/video_json.json" 4 times.(å´¹ˆûÿÿÿÿ
-Tpython:S5754H"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
-6python:S125>"Remove this commented out code.(å©ßş
-Tpython:S5754Y"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
-6python:S125O"Remove this commented out code.(å©ßş
-lpython:S3776`"TRefactor this function to reduce its Cognitive Complexity from 75 to the 15 allowed.(˜¦Ò”
-ppython:S3923"RRemove this if statement or edit its code blocks so that they're not all the same.(¡Öï·ûÿÿÿÿ
-Upython:S5754×"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
-<python:S125"Remove this commented out code.(ÊšÃÀúÿÿÿÿ
-7python:S125˜"Remove this commented out code.(ÚåşŞ
-7python:S125Û"Remove this commented out code.(¸Í
+npython:S1192A"JDefine a constant instead of duplicating this literal "socks5://" 4 times.(Ë¬ÿ¾ÿÿÿÿÿ8ºûÓ÷æ0
+upython:S1192$"VDefine a constant instead of duplicating this literal "http://www.baidu.com/" 3 times.(†­Õç8ºûÓ÷æ0
+xpython:S1192µ"SDefine a constant instead of duplicating this literal "%s/video_json.json" 4 times.(å´¹ˆûÿÿÿÿ8ºûÓ÷æ0
+[python:S5754H"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8»ûÓ÷æ0
+=python:S125>"Remove this commented out code.(å©ßş8»ûÓ÷æ0
+[python:S5754Y"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8»ûÓ÷æ0
+=python:S125O"Remove this commented out code.(å©ßş8»ûÓ÷æ0
+spython:S3776`"TRefactor this function to reduce its Cognitive Complexity from 75 to the 15 allowed.(˜¦Ò”8»ûÓ÷æ0
+Cpython:S125Û"Remove this commented out code.(·Ù©şÿÿÿÿ8’ïí÷æ0
+wpython:S3923"RRemove this if statement or edit its code blocks so that they're not all the same.(¡Öï·ûÿÿÿÿ8¼ûÓ÷æ0
+\python:S5754Ø"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8¼ûÓ÷æ0
+>python:S125Ö"Remove this commented out code.(¸Í8¼ûÓ÷æ0

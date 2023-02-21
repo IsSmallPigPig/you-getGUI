@@ -345,11 +345,11 @@ def set_cmd(*args):
     else:
         pass
     # 启用下载按钮
-    m.download_Button['state'] = 'active'
+    # m.download_Button['state'] = 'active'
     # 启用确认按钮
-    m.makesure_Button['state'] = 'active'
+    # m.makesure_Button['state'] = 'active'
     # 启用下拉框
-    m.combobox['state'] = 'active'
+    # m.combobox['state'] = 'active'
 
 def makesure_thread(*args):
     """
@@ -467,6 +467,7 @@ def get_json_stream(json_obj):
             v.STREAM_DICT[item] = json_stream[item]['quality']
             # 获得便于查询的字典
             v.STREAM_DICT_VK[json_stream[item]['quality']] = item
+            m.download_Button['state'] = 'disabled'
         return 1
     except:
         messagebox.showerror(title="链接错误",
@@ -499,7 +500,7 @@ def makesure_command(*args):
     # 传入真伪判断值
     global flag
     # 清空列表
-    c.cmd_list = ["%s/you-get" % home]
+    c.cmd_list = [r".\Core\you-get.exe"]
     set_cmd()
     if flag == 1:
         print("通过")
@@ -523,18 +524,12 @@ def makesure_command(*args):
             # 启用
             m.combobox['state'] = 'readonly'
 
-            # 设置下拉框可用
-            # m.combobox['state'] = 'readonly'
-            # 设置下载按钮不可用
-            # m.downlaod_Button['state'] = 'disabled'
             # 获得指令内容
             v.CMD = c.get_cmd_information()
             # 清除上次生成的指令
             m.cmd_var.set("生成指令")
             # 显示指令
             m.cmd_var.set(v.CMD)
-            # 设置下载按钮可用
-            # m.downlaod_Button['state'] = 'active'
         else:
             return None
 
