@@ -1,11 +1,7 @@
 import subprocess
-import tkinter.messagebox
-
-import Tool.menu as m
-import os
 
 # 指令列表
-cmd_list = [r".\Core\you-get.exe"]
+cmd_list = [r".\depend\you-get.exe"]
 
 
 def video_url(url):
@@ -17,15 +13,16 @@ def video_url(url):
     cmd_list.append(url)
 
 
-def run_cmd(cmd: list):
+def run_cmd(cmd_run: list):
     """
     运行指令 demo
     :param cmd: 指令列表
     :return: stdout
     """
+    print(cmd_run)
     # 运行指令
     cmd = subprocess.run(
-        cmd,
+        cmd_run,
         capture_output=True)
 
     # 返回信息
@@ -33,23 +30,6 @@ def run_cmd(cmd: list):
         return cmd.stdout.decode("utf-8")
     elif cmd.stderr.decode("utf-8") != "":
         return cmd.stderr.decode("utf-8")
-
-
-def download_video(*args):
-    """
-    启动下载
-    :param args:不用填形参
-    :return: 返回执行结果
-    """
-    cmd_info = run_cmd(cmd_list)
-    # 停止进度条
-    m.progressbarOne.stop()
-    # 显示对话框
-    tkinter.messagebox.showinfo(title="下载完成", message='下载完成')
-    # 解除禁用控件
-    m.makesure_Button['state'] = 'active'
-    m.combobox['state'] = 'readonly'
-    return cmd_info
 
 
 def info(url, cookies=''):
@@ -61,10 +41,10 @@ def info(url, cookies=''):
     """
     print(cookies)
     if cookies == '':
-        # print(run_cmd([r".\Core\you-get.exe", '-i', url]))
-        return run_cmd([r".\Core\you-get.exe", '-i', url])
+        # print(run_cmd([r".\depend\you-get.exe", '-i', url]))
+        return run_cmd([r".\depend\you-get.exe", '-i', url])
     else:
-        return run_cmd([r".\Core\you-get.exe", '-i', url, '-c', cookies])
+        return run_cmd([r".\depend\you-get.exe", '-i', url, '-c', cookies])
 
 
 def get_url(url, cookies=''):
@@ -75,9 +55,9 @@ def get_url(url, cookies=''):
     :return: 返回信息
     """
     if cookies == '':
-        return run_cmd([r".\Core\you-get.exe", '-u', url])
+        return run_cmd([r".\depend\you-get.exe", '-u', url])
     else:
-        return run_cmd([r".\Core\you-get.exe", '-u', url, '-c', cookies])
+        return run_cmd([r".\depend\you-get.exe", '-u', url, '-c', cookies])
 
 
 def get_version(*args):
@@ -85,7 +65,7 @@ def get_version(*args):
     获得版本号
     :return: 返回版本号
     """
-    return run_cmd([r".\Core\you-get.exe", '-V'])
+    return run_cmd([r".\depend\you-get.exe", '-V'])
 
 
 def get_help(*args):
@@ -93,7 +73,7 @@ def get_help(*args):
     获得帮助
     :return: 返回帮助
     """
-    return run_cmd([r".\Core\you-get.exe", '-h'])
+    return run_cmd([r".\depend\you-get.exe", '-h'])
 
 
 def get_json(url: str, cookies=''):
@@ -104,9 +84,9 @@ def get_json(url: str, cookies=''):
     :return: 返回json（
     """
     if cookies == '':
-        return run_cmd([r".\Core\you-get.exe", '--json', url])
+        return run_cmd([r".\depend\you-get.exe", '--json', url])
     else:
-        return run_cmd([r".\Core\you-get.exe", '--json', url, '-c', cookies])
+        return run_cmd([r".\depend\you-get.exe", '--json', url, '-c', cookies])
 
 
 def no_merge(*args):
@@ -288,13 +268,21 @@ def http_proxy(host: str, port: str):
 
 def extractor_proxy(host: str, port: str):
     """
-    只使用一个 http 代理提取
+    只使用 http 代理进行提取操作
     :param host:主机名
     :param port: 端口
     :return: 无返回值
     """
     cmd_list.append("--extractor-proxy")
     cmd_list.append("%s:%s" % (host, port))
+    return None
+
+def no_proxy():
+    """
+    不使用代理
+    :return:
+    """
+    cmd_list.append("--no-proxy")
     return None
 
 
