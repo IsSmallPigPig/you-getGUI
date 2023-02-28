@@ -216,7 +216,7 @@
 
 - [rdbende/Sun-Valley-ttk-theme](https://github.com/rdbende/Sun-Valley-ttk-theme)
 
-<img src="./You%20Get%20Preview%20%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.assets/e2fb8460fcfb2d115be9214e037d2c1d813bc786.png" alt="GitHub - rdbende/Sun-Valley-ttk-theme: A gorgeous theme for ttk, based on Microsoft's Sun Valley visual styles ✨" style="zoom:50%;" />
+  <img src="./You%20Get%20Preview%20%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.assets/e2fb8460fcfb2d115be9214e037d2c1d813bc786.png" alt="GitHub - rdbende/Sun-Valley-ttk-theme: A gorgeous theme for ttk, based on Microsoft's Sun Valley visual styles ✨" style="zoom: 50%;" />
 
 - [FFmpeg/FFmpeg](https://github.com/FFmpeg/FFmpeg)
 
