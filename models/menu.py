@@ -1,7 +1,7 @@
 import ctypes
 import os
 import threading
-
+import darkdetect
 from tkdev4 import DevManage, Icon_Empty
 import sv_ttk
 import tkinter as tk
@@ -10,6 +10,7 @@ from tkinter import messagebox, filedialog
 import models.tools as t
 import models.constants as c
 import Core.you_get as y
+
 
 class EntryWithPlaceholder(Entry):
     def __init__(self, master=None, placeholder="PLACEHOLDER", foreground='grey'):
@@ -38,6 +39,7 @@ class EntryWithPlaceholder(Entry):
         if not self.get():
             self.put_placeholder()
 
+
 class App():
     def __init__(self):
         # 超类调用
@@ -54,8 +56,6 @@ class App():
         self.root.iconbitmap(Icon_Empty)
         # 接管窗口
         self.manage = DevManage(self.root)
-        # 设置主题为明亮
-        sv_ttk.set_theme('light')
 
         # 设置部分控件风格
         style = Style()
@@ -113,6 +113,17 @@ class App():
         # 存储路径
         self.save_path_var = tk.StringVar()
         self.save_path_var.set('Set Output Path')
+        # 主题
+        self.theme_var = tk.IntVar()
+        if darkdetect.isDark():
+            # 由于调用函数逻辑与主题颜色相反（即获取sv_ttk是黑色则改白色），所以使用这种方式
+            print('dark')
+            sv_ttk.set_theme('light')
+            self.theme_var.set(1)
+        else:
+            sv_ttk.set_theme('dark')
+            self.theme_var.set(0)
+        # self.theme_config()
 
     def disabled_proxy_command(self):
         if self.proxy_var.get() == 1:
@@ -135,7 +146,7 @@ class App():
             self.socks_password_entry.config(state='active')
             self.use_socks_check.config(state='disable')
             self.use_http_check.config(state='disable')
-    
+
     def only_for_extracting_command(self):
         if self.proxy_only_for_extracting_var.get() == 1:
             self.socks_host_entry.config(state='disable')
@@ -147,7 +158,7 @@ class App():
             self.socks_port_entry.config(state='active')
             self.socks_username_entry.config(state='active')
             self.socks_password_entry.config(state='active')
-            
+
     def use_http_command(self):
         if self.use_http_var.get() == 1:
             self.http_host_entry.config(state='active')
@@ -156,7 +167,7 @@ class App():
         else:
             self.http_host_entry.config(state='disable')
             self.http_port_entry.config(state='disable')
-    
+
     def use_socks_command(self):
         if self.use_socks_var.get() == 1:
             self.socks_host_entry.config(state='active')
@@ -169,7 +180,7 @@ class App():
             self.socks_port_entry.config(state='disable')
             self.socks_username_entry.config(state='disable')
             self.socks_password_entry.config(state='disable')
-    
+
     def set_all_command(self):
         y.cmd_list = [r".\depend\you-get.exe"]
         # 获得所有输入框内容
@@ -188,7 +199,8 @@ class App():
         if self.url != '':
             y.video_url(self.url)
         elif self.url == '':
-            self.nourl = messagebox.showerror('No URL was entered', 'Please enter the URL, otherwise the download operation cannot be performed')
+            self.nourl = messagebox.showerror('No URL was entered',
+                                              'Please enter the URL, otherwise the download operation cannot be performed')
             self.flag = 0
             return None
         # 输入值
@@ -224,7 +236,8 @@ class App():
         if self.cookies != '':
             y.cookies_file(self.cookies)
         elif self.cookies == '':
-            self.nocookies = messagebox.askyesno('No cookies are submitted', 'If you do not submit cookies, you will not be able to download VIP and HD videos')
+            self.nocookies = messagebox.askyesno('No cookies are submitted',
+                                                 'If you do not submit cookies, you will not be able to download VIP and HD videos')
             if self.nocookies == False:
                 self.flag = 0
                 return None
@@ -236,7 +249,7 @@ class App():
             y.output_dir(self.path)
         elif self.path == '':
             self.nopath = messagebox.askyesno('You did not enter a save path',
-                                                 'The default save path is the user folder (%s), whether to continue' % self.home)
+                                              'The default save path is the user folder (%s), whether to continue' % self.home)
             if self.nopath == True:
                 y.output_dir(self.home)
             else:
@@ -270,7 +283,8 @@ class App():
             self.get_information_button.config(state='disable')
             self.get_version_button.config(state='disable')
             # 提示用戶不要亂搞
-            t.show_info(title='Do not close the main program window', message='The URL is now being resolved and may take a long time. Please wait.\n Do not close the terminal')
+            t.show_info(title='Do not close the main program window',
+                        message='The URL is now being resolved and may take a long time. Please wait.\nDo not close the terminal')
             # 下载json
             t.write("%s/video_json.json" % self.home, t.get_json(self.url, cookies=self.cookies))
             flag_json = t.get_json_stream("%s/video_json.json" % self.home)
@@ -310,7 +324,8 @@ class App():
                 self.get_json_button.config(state='active')
                 self.get_information_button.config(state='active')
                 self.get_version_button.config(state='active')
-                t.show_info(title='something was wrong', message='You entered the wrong information and could not start the download operation')
+                t.show_info(title='something was wrong',
+                            message='You entered the wrong information and could not start the download operation')
 
         else:
             print("未通过")
@@ -344,7 +359,9 @@ class App():
                 self.command_text.delete('1.0', 'end')
                 self.command_text.insert('insert', self.get_url)
             else:
-                messagebox.showerror('Enter the URL first', 'You did not enter a URL, so we can not get the URL for you')
+                messagebox.showerror('Enter the URL first',
+                                     'You did not enter a URL, so we can not get the URL for you')
+
         self.get_link_thread = threading.Thread(target=get_link_start)
         # 启动线程
         if self.get_link_thread.is_alive() is False:
@@ -358,7 +375,9 @@ class App():
                 self.command_text.delete('1.0', 'end')
                 self.command_text.insert('insert', self.get_info)
             else:
-                messagebox.showerror('Enter the URL first', 'You did not enter a URL, so we can not get the infomation for you')
+                messagebox.showerror('Enter the URL first',
+                                     'You did not enter a URL, so we can not get the infomation for you')
+
         self.get_extracted_thread = threading.Thread(target=show_extracted)
         # 启动线程
         if self.get_extracted_thread.is_alive() is False:
@@ -372,14 +391,16 @@ class App():
                 self.command_text.delete('1.0', 'end')
                 self.command_text.insert('insert', self.get_json)
                 self.savejson = messagebox.askyesno('Do you want to save Json?',
-                                    'For aesthetics, the terminal is relatively small. Saving JSON to your local location makes it easy to view it')
+                                                    'For aesthetics, the terminal is relatively small. Saving JSON to your local location makes it easy to view it')
                 if self.savejson == True:
-                    self.open_save_path = filedialog.askdirectory(title='Where you want to save it', initialdir=self.home)
+                    self.open_save_path = filedialog.askdirectory(title='Where you want to save it',
+                                                                  initialdir=self.home)
                     # 写入文件
                     t.write(r'%s\video_json.json' % self.open_save_path, self.get_json)
 
             else:
-                messagebox.showerror('Enter the URL first', 'You did not enter a URL, so we can not get the infomation for you')
+                messagebox.showerror('Enter the URL first',
+                                     'You did not enter a URL, so we can not get the infomation for you')
 
         self.get_json_thread = threading.Thread(target=show_json)
         # 启动线程
@@ -411,8 +432,7 @@ class App():
         print(y.cmd_list)
         self.cmd_info = y.run_cmd(y.cmd_list)
         print(c.CMD)
-        # 显示对话框
-        t.show_info(title='The download is complete', message='The video has been saved to the path you specified')
+
         # 解除禁用控件
         self.already_button['state'] = 'active'
         self.stream_combobox['state'] = 'readonly'
@@ -436,7 +456,8 @@ class App():
             print(c.STREAM_ID)
             # 发送下载指令
             self.cmd = self.download_video()
-
+            # 显示对话框
+            t.show_info(title='The download is complete', message='The video has been saved to the path you specified')
             # 结束后显示下载结果
             self.command_text.insert('insert', self.cmd)
             # 切换状态
@@ -458,17 +479,22 @@ class App():
         self.cookies_var.set(t.get_firefox_cookie_path())
 
     def import_cookies(self):
-        self.cookies_var.set(filedialog.askopenfilename(title='Open the Cookies path', initialdir=self.home, filetypes=[('cookies.sqlite', 'cookies.sqlite'), ('cookies.txt', 'cookies.txt')]))
+        self.cookies_var.set(filedialog.askopenfilename(title='Open the Cookies path', initialdir=self.home,
+                                                        filetypes=[('cookies.sqlite', 'cookies.sqlite'),
+                                                                   ('cookies.txt', 'cookies.txt')]))
 
     def theme_config(self):
         # 如果是明亮主题
         if sv_ttk.get_theme() == 'light':
+            print(1)
             # 更改标题栏
             self.manage.dwm_set_window_attribute_use_dark_mode()
             # 更改配色
             sv_ttk.set_theme('dark')
             # 设置终端
             self.command_text.config(highlightbackground='#2f2f2f', highlightcolor='#57c8ff')
+            # 设置为黑
+            self.theme_var.set(1)
         elif sv_ttk.get_theme() == 'dark':
             print(1)
             # 更改标题栏
@@ -477,22 +503,30 @@ class App():
             sv_ttk.set_theme('light')
             # 设置终端
             self.command_text.config(highlightbackground='#ebebeb', highlightcolor='#0560b6')
+            # 设置为白
+            self.theme_var.set(0)
 
     def download_options(self):
         # 下载选项的背景框
         self.download_labelframe = LabelFrame(text='Download Options', padding=15)
         # m3u8 检查按钮
-        self.m3u8_check = Checkbutton(self.download_labelframe, text='Using m3u8 URL', state='normal', style='myCheck.TCheckbutton', variable=self.m3u8_var)
+        self.m3u8_check = Checkbutton(self.download_labelframe, text='Using m3u8 URL', state='normal',
+                                      style='myCheck.TCheckbutton', variable=self.m3u8_var)
         # 自动重命名 检查按钮
-        self.auto_rename_check = Checkbutton(self.download_labelframe, text='Auto Rename', state='normal', style='myCheck.TCheckbutton', variable=self.rename_var)
+        self.auto_rename_check = Checkbutton(self.download_labelframe, text='Auto Rename', state='normal',
+                                             style='myCheck.TCheckbutton', variable=self.rename_var)
         # 强制覆盖重名文件 检查按钮
-        self.force_file_check = Checkbutton(self.download_labelframe, text='Overwrite Files', state='normal', style='myCheck.TCheckbutton', variable=self.overwrite_var)
+        self.force_file_check = Checkbutton(self.download_labelframe, text='Overwrite Files', state='normal',
+                                            style='myCheck.TCheckbutton', variable=self.overwrite_var)
         # 不检查文件大小检查按钮
-        self.skip_check_check = Checkbutton(self.download_labelframe, text='Skip Check File Size', state='normal', style='myCheck.TCheckbutton', variable=self.check_size_var)
+        self.skip_check_check = Checkbutton(self.download_labelframe, text='Skip Check File Size', state='normal',
+                                            style='myCheck.TCheckbutton', variable=self.check_size_var)
         # 不下载字幕检查按钮
-        self.no_caption_check = Checkbutton(self.download_labelframe, text='Download Captions', state='normal', style='myCheck.TCheckbutton', variable=self.captions_var)
+        self.no_caption_check = Checkbutton(self.download_labelframe, text='Download Captions', state='normal',
+                                            style='myCheck.TCheckbutton', variable=self.captions_var)
         # 不合并视频
-        self.no_merge_check = Checkbutton(self.download_labelframe, text='Merge Video Parts', state='normal', style='myCheck.TCheckbutton', variable=self.merge_var)
+        self.no_merge_check = Checkbutton(self.download_labelframe, text='Merge Video Parts', state='normal',
+                                          style='myCheck.TCheckbutton', variable=self.merge_var)
 
         self.m3u8_check.pack(fill='x', pady=5, padx=5)
         self.auto_rename_check.pack(fill='x', pady=5, padx=5)
@@ -506,17 +540,23 @@ class App():
         # 调试选项的背景框
         self.debug_labelframe = Labelframe(text='Debug Options', padding=15)
         # 下载调试模式
-        self.download_debug_check = Checkbutton(self.debug_labelframe, text='Show Debug Info', state='normal', style='myCheck.TCheckbutton', variable=self.debug_var)
+        self.download_debug_check = Checkbutton(self.debug_labelframe, text='Show Debug Info', state='normal',
+                                                style='myCheck.TCheckbutton', variable=self.debug_var)
         # 忽略 ssl 错误
-        self.ignore_ssl_check = Checkbutton(self.debug_labelframe, text='Ignore SSL Errors', state='normal', style='myCheck.TCheckbutton', variable=self.ssl_var)
+        self.ignore_ssl_check = Checkbutton(self.debug_labelframe, text='Ignore SSL Errors', state='normal',
+                                            style='myCheck.TCheckbutton', variable=self.ssl_var)
         # 获得下载 URL
-        self.get_url_button = Button(self.debug_labelframe, text='Show Download Link', state='normal', style='myButton.TButton', command=self.show_download_link_command)
+        self.get_url_button = Button(self.debug_labelframe, text='Show Download Link', state='normal',
+                                     style='myButton.TButton', command=self.show_download_link_command)
         # 获得解析内容
-        self.get_information_button = Button(self.debug_labelframe, text='Show Extracted Info', state='normal', style='myButton.TButton', command=self.show_extracted_info)
+        self.get_information_button = Button(self.debug_labelframe, text='Show Extracted Info', state='normal',
+                                             style='myButton.TButton', command=self.show_extracted_info)
         # 获得信息json
-        self.get_json_button = Button(self.debug_labelframe, text='Show Extracted Json', state='normal', style='myButton.TButton', command=self.show_extracted_json)
+        self.get_json_button = Button(self.debug_labelframe, text='Show Extracted Json', state='normal',
+                                      style='myButton.TButton', command=self.show_extracted_json)
         # 查看版本
-        self.get_version_button = Button(self.debug_labelframe, text='Show Version', state='normal', style='myButton.TButton', command=self.show_version)
+        self.get_version_button = Button(self.debug_labelframe, text='Show Version', state='normal',
+                                         style='myButton.TButton', command=self.show_version)
         # 套接字延时
         self.socket_time_entry = EntryWithPlaceholder(self.debug_labelframe, 'Socket Timeout')
 
@@ -535,12 +575,19 @@ class App():
         # 分割线
         self.http_separator = Separator(self.proxy_labelframe)
         # 禁止使用代理检查按钮
-        self.no_proxy = Checkbutton(self.proxy_labelframe, text='Disabled Proxy', state='normal', style='myButton.TCheckbutton', variable=self.proxy_var, command=self.disabled_proxy_command)
+        self.no_proxy = Checkbutton(self.proxy_labelframe, text='Disabled Proxy', state='normal',
+                                    style='myButton.TCheckbutton', variable=self.proxy_var,
+                                    command=self.disabled_proxy_command)
         # 仅使用代理进行解析
-        self.only_use_extracting = Checkbutton(self.proxy_labelframe, text='Only For Extracting', state='normal', style='myButton.TCheckbutton', variable=self.proxy_only_for_extracting_var, command=self.only_for_extracting_command)
+        self.only_use_extracting = Checkbutton(self.proxy_labelframe, text='Only For Extracting', state='normal',
+                                               style='myButton.TCheckbutton',
+                                               variable=self.proxy_only_for_extracting_var,
+                                               command=self.only_for_extracting_command)
 
         # 使用 http 代理
-        self.use_http_check = Checkbutton(self.proxy_labelframe, text='Use HTTP Proxy', state='normal', style='myButton.TCheckbutton', variable=self.use_http_var, command=self.use_http_command)
+        self.use_http_check = Checkbutton(self.proxy_labelframe, text='Use HTTP Proxy', state='normal',
+                                          style='myButton.TCheckbutton', variable=self.use_http_var,
+                                          command=self.use_http_command)
         # http 代理主机输入框
         self.http_host_entry = EntryWithPlaceholder(self.proxy_labelframe, 'HTTP Proxy (HOST)')
         self.http_host_entry.config(state='disable')
@@ -549,7 +596,9 @@ class App():
         self.http_port_entry.config(state='disable')
 
         # 使用 socks 代理
-        self.use_socks_check = Checkbutton(self.proxy_labelframe, text='Use SOCKS Proxy', state='normal', style='myButton.TCheckbutton', variable=self.use_socks_var, command=self.use_socks_command)
+        self.use_socks_check = Checkbutton(self.proxy_labelframe, text='Use SOCKS Proxy', state='normal',
+                                           style='myButton.TCheckbutton', variable=self.use_socks_var,
+                                           command=self.use_socks_command)
         # 分割线
         self.socks_separator = Separator(self.proxy_labelframe)
         # socks5 代理主机输入框
@@ -608,11 +657,13 @@ class App():
         # 获得火狐Cookies
         self.get_cookies_button = Button(self.start_labelframe, text='Get Cookies(Auto)', command=self.auto_get_cookies)
         # 导入火狐Cookies
-        self.import_cookies_button = Button(self.start_labelframe, text='Import Cookies(Manual)', command=self.import_cookies)
+        self.import_cookies_button = Button(self.start_labelframe, text='Import Cookies(Manual)',
+                                            command=self.import_cookies)
         # 分割线
         self.already_separator = Separator(self.start_labelframe)
         # 准备好了按钮
-        self.already_button = Button(self.start_labelframe, text='Complete', style='Accent.TButton', command=self.already_thread)
+        self.already_button = Button(self.start_labelframe, text='Complete', style='Accent.TButton',
+                                     command=self.already_thread)
         # 分割线
         self.already_separator_last = Separator(self.start_labelframe)
         # 命令生成显示
@@ -623,11 +674,13 @@ class App():
         # 分割线
         self.download_separator = Separator(self.start_labelframe)
         # 开始下载按钮
-        self.download_button = Button(self.start_labelframe, text='Download', command=self.download_command, state='disable')
+        self.download_button = Button(self.start_labelframe, text='Download', command=self.download_command,
+                                      state='disable')
         # 分割线
         self.download_separator_last = Separator(self.start_labelframe)
         # 终端
-        self.command_text = tk.Text(self.start_labelframe, bd=2, relief='flat', highlightthickness=2, highlightbackground='#ebebeb', highlightcolor='#005fb8', background='#fafafa')
+        self.command_text = tk.Text(self.start_labelframe, bd=2, relief='flat', highlightthickness=2,
+                                    highlightbackground='#ebebeb', highlightcolor='#005fb8')
 
         self.url_entry.pack(fill='x', padx=5, pady=5)
         self.url_separator.pack(fill='x', padx=5, pady=10)
@@ -653,7 +706,9 @@ class App():
         # 关于程序的背景框
         self.about_labelframe = Labelframe(text='About Program', padding=15)
         # 暗黑模式切换
-        self.change_theme_check = Checkbutton(self.about_labelframe, text='Dark Theme', state='normal', style="Switch.TCheckbutton", command=self.theme_config)
+        self.change_theme_check = Checkbutton(self.about_labelframe, text='Dark Theme', state='normal',
+                                              style="Switch.TCheckbutton", command=self.theme_config,
+                                              variable=self.theme_var)
         # 打开配置文件按钮
         self.open_options_button = Button(self.about_labelframe, text='Open Options')
         # 打开帮助
@@ -667,7 +722,8 @@ class App():
         # 当前代码版本
         self.version_label = Label(self.about_us_labelframe, text='Version: v1.0.1')
         # 交流群
-        self.contact_label = Label(self.about_us_labelframe, text='Contact Us:\nQQ Groups: 473542615\nEmail: 3552354372@qq.com')
+        self.contact_label = Label(self.about_us_labelframe,
+                                   text='Contact Us:\nQQ Groups: 473542615\nEmail: 3552354372@qq.com')
         # 许可证
         self.license_label = Label(self.about_us_labelframe, text='Licence: MIT License')
         # 基于项目
@@ -685,51 +741,6 @@ class App():
         self.developer_label.pack(fill='x', padx=5, pady=5)
         self.about_labelframe.place(x=800, y=10, height=670, width=250)
 
-
-    def dark_title_bar(self, window):
-        """
-        标题栏黑化
-        :param window: tkinter窗口
-        :return: 不返回值
-        """
-        window.update()
-        # 设置暗黑模式数值
-        DWMWA_USE_IMMERSIVE_DARK_MODE = 20
-        # 设置窗口属性
-        set_window_attribute = ctypes.windll.dwmapi.DwmSetWindowAttribute
-        # 找父窗口
-        get_parent = ctypes.windll.user32.GetParent
-        # 获取它的wininfo_id转换成句柄
-        hwnd = get_parent(window.winfo_id())
-        # DWM渲染模式？
-        rendering_policy = DWMWA_USE_IMMERSIVE_DARK_MODE
-        value = 2
-        value = ctypes.c_int(value)
-        set_window_attribute(hwnd, rendering_policy, ctypes.byref(value), ctypes.sizeof(value))  # 设置
-        window.update()
-
-    def light_title_bar(self, window):
-        """
-        标题栏白化
-        :param window: tkinter窗口
-        :return: 不返回值
-        """
-        window.update()
-        # 设置暗黑模式数值
-        DWMWA_USE_IMMERSIVE_LIGHT_MODE = 0
-        # 设置窗口属性
-        set_window_attribute = ctypes.windll.dwmapi.DwmSetWindowAttribute
-        # 找父窗口
-        get_parent = ctypes.windll.user32.GetParent
-        # 获取它的wininfo_id转换成句柄
-        hwnd = get_parent(window.winfo_id())
-        # DWM渲染模式？
-        rendering_policy = DWMWA_USE_IMMERSIVE_LIGHT_MODE
-        value = 0
-        value = ctypes.c_int(value)
-        set_window_attribute(hwnd, rendering_policy, ctypes.byref(value), ctypes.sizeof(value))  # 设置
-        window.update()
-
     def run(self):
         # 下载选项控件
         self.download_options()
@@ -741,6 +752,8 @@ class App():
         self.save_options()
         # 开始选项控件
         self.start_options()
+        # 设置主题
+        self.theme_config()
         # 关于
         self.about_program()
         # 运行代码
