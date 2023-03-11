@@ -2,14 +2,16 @@ import ctypes
 import os
 import threading
 import darkdetect
-from tkdev4 import DevManage, Icon_Empty
+from tkdev4 import DevManage
 import sv_ttk
 import tkinter as tk
 from tkinter.ttk import *
 from tkinter import messagebox, filedialog
-import models.tools as t
+import tools.tool as t
 import models.constants as c
 import Core.you_get as y
+import platform
+import tools.proxy as p
 
 
 class EntryWithPlaceholder(Entry):
@@ -42,6 +44,12 @@ class EntryWithPlaceholder(Entry):
 
 class App():
     def __init__(self):
+        # 获得用户主目录
+        self.home = os.path.expanduser('~')
+        # 真伪
+        self.flag = 1
+
+    def root_create(self):
         # 超类调用
         super(App, self).__init__()
         # 创建窗口
@@ -53,20 +61,39 @@ class App():
         # 更换标题
         self.root.title('Video Download Tools')
         # 去除 icon
-        self.root.iconbitmap(Icon_Empty)
+        self.root.iconbitmap('.\icon32.ico')
         # 接管窗口
         self.manage = DevManage(self.root)
+        # 主题
+        self.theme_var = tk.IntVar()
 
         # 设置部分控件风格
         style = Style()
         style.configure('myCheck.TCheckbutton')
         style.configure('myButton.TButton')
 
-        # 获得用户主目录
-        self.home = os.path.expanduser('~')
-        # 真伪
-        self.flag = 1
+        # 适配 dpi
+        if 'Windows' == platform.system():
+            # 调用api设置成由应用程序缩放
+            ctypes.windll.shcore.SetProcessDpiAwareness(1)
+            # 调用api获得当前的缩放因子
+            ScaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
+            # 设置缩放因子
+            self.root.call('tk', 'scaling', ScaleFactor / 75)
+            # 设置缩放因子
+            self.root.tk.call('tk', 'scaling', ScaleFactor / 75)
 
+        if darkdetect.isDark():
+            # 由于调用函数逻辑与主题颜色相反（即获取sv_ttk是黑色则改白色），所以使用这种方式
+            print('dark')
+            sv_ttk.set_theme('light')
+            self.theme_var.set(1)
+        else:
+            sv_ttk.set_theme('dark')
+            self.theme_var.set(0)
+
+
+    def var_create(self):
         # 设置 CheckButton 默认状态
         # m3u8
         self.m3u8_var = tk.IntVar()
@@ -76,7 +103,7 @@ class App():
         self.rename_var.set(1)
         # overwrite
         self.overwrite_var = tk.IntVar()
-        self.overwrite_var.set(1)
+        self.overwrite_var.set(0)
         # check size
         self.check_size_var = tk.IntVar()
         self.check_size_var.set(0)
@@ -98,12 +125,11 @@ class App():
         # only for extracting
         self.proxy_only_for_extracting_var = tk.IntVar()
         self.proxy_only_for_extracting_var.set(0)
-        # use http
-        self.use_http_var = tk.IntVar()
-        self.use_http_var.set(0)
-        # use socks
-        self.use_socks_var = tk.IntVar()
-        self.use_socks_var.set(0)
+        # use proxy
+        self.use_proxy_var = tk.IntVar()
+        # 禁用批量
+        self.disable_batch_var = tk.IntVar()
+        self.disable_batch_var.set(0)
         # cookies
         self.cookies_var = tk.StringVar()
         self.cookies_var.set('Firefox Cookies')
@@ -113,17 +139,12 @@ class App():
         # 存储路径
         self.save_path_var = tk.StringVar()
         self.save_path_var.set('Set Output Path')
-        # 主题
-        self.theme_var = tk.IntVar()
-        if darkdetect.isDark():
-            # 由于调用函数逻辑与主题颜色相反（即获取sv_ttk是黑色则改白色），所以使用这种方式
-            print('dark')
-            sv_ttk.set_theme('light')
-            self.theme_var.set(1)
-        else:
-            sv_ttk.set_theme('dark')
-            self.theme_var.set(0)
-        # self.theme_config()
+        # 批量下载文件
+        self.batch_var = tk.StringVar()
+        self.batch_var.set('Save URLs File Path')
+        # playlist
+        self.playlist_var = tk.IntVar()
+        self.playlist_var.set(1)
 
     def disabled_proxy_command(self):
         if self.proxy_var.get() == 1:
@@ -136,6 +157,7 @@ class App():
             self.socks_password_entry.config(state='disable')
             self.use_socks_check.config(state='disable')
             self.use_http_check.config(state='disable')
+            # self.use_socks_check.de
         else:
             self.only_use_extracting.config(state='active')
             self.http_host_entry.config(state='active')
@@ -144,42 +166,40 @@ class App():
             self.socks_port_entry.config(state='active')
             self.socks_username_entry.config(state='active')
             self.socks_password_entry.config(state='active')
-            self.use_socks_check.config(state='disable')
-            self.use_http_check.config(state='disable')
+            self.use_socks_check.config(state='active')
+            self.use_http_check.config(state='active')
 
     def only_for_extracting_command(self):
         if self.proxy_only_for_extracting_var.get() == 1:
+            self.use_socks_check.config(state='disable')
             self.socks_host_entry.config(state='disable')
             self.socks_port_entry.config(state='disable')
             self.socks_username_entry.config(state='disable')
             self.socks_password_entry.config(state='disable')
+            # self.use_socks_var.set(0)
+        else:
+            self.use_socks_check.config(state='active')
+
+    def use_proxy_command(self):
+        if self.use_proxy_var.get() == 1:
+            self.http_host_entry.config(state='active')
+            self.http_port_entry.config(state='active')
+            self.socks_host_entry.config(state='disable')
+            self.socks_port_entry.config(state='disable')
+            self.socks_username_entry.config(state='disable')
+            self.socks_password_entry.config(state='disable')
+            # self.use_socks_var.set(0)
         else:
             self.socks_host_entry.config(state='active')
             self.socks_port_entry.config(state='active')
             self.socks_username_entry.config(state='active')
             self.socks_password_entry.config(state='active')
-
-    def use_http_command(self):
-        if self.use_http_var.get() == 1:
-            self.http_host_entry.config(state='active')
-            self.http_port_entry.config(state='active')
-
-        else:
             self.http_host_entry.config(state='disable')
             self.http_port_entry.config(state='disable')
 
-    def use_socks_command(self):
-        if self.use_socks_var.get() == 1:
-            self.socks_host_entry.config(state='active')
-            self.socks_port_entry.config(state='active')
-            self.socks_username_entry.config(state='active')
-            self.socks_password_entry.config(state='active')
 
-        else:
-            self.socks_host_entry.config(state='disable')
-            self.socks_port_entry.config(state='disable')
-            self.socks_username_entry.config(state='disable')
-            self.socks_password_entry.config(state='disable')
+    def save_path_command(self):
+        self.save_path_var.set(filedialog.askdirectory(initialdir=self.home, title='Open the storage path'))
 
     def set_all_command(self):
         y.cmd_list = [r".\depend\you-get.exe"]
@@ -195,14 +215,76 @@ class App():
         self.path = self.save_path_entry.get().replace('Set Output Path', '')
         self.url = self.url_entry.get().replace('Video URL(Required)', '')
         self.cookies = self.cookies_entry.get().replace('Firefox Cookies', '')
+        self.urls_path = self.input_file_entry.get().replace('Save URLs File Path', '')
 
-        if self.url != '':
+        if self.url != '' or self.playlist_var.get() == 0:
             y.video_url(self.url)
         elif self.url == '':
             self.nourl = messagebox.showerror('No URL was entered',
                                               'Please enter the URL, otherwise the download operation cannot be performed')
             self.flag = 0
             return None
+
+        if self.path != '':
+            y.output_dir(self.path)
+        elif self.path == '':
+            self.nopath = messagebox.askyesno('You did not enter a save path',
+                                              'The default save path is the user folder (%s), whether to continue' % self.home)
+            if self.nopath == True:
+                y.output_dir(self.home)
+            else:
+                self.flag = 0
+                return None
+
+        if self.filename != '':
+            y.filename(self.filename)
+
+        if self.cookies != '':
+            y.cookies_file(self.cookies)
+        elif self.cookies == '':
+            self.nocookies = messagebox.askyesno('No cookies are submitted',
+                                                 'If you do not submit cookies, you will not be able to download VIP and HD videos')
+            if self.nocookies == False:
+                self.flag = 0
+                return None
+
+        if self.urls_path != '':
+            y.input_file(self.urls_path)
+
+        if self.proxy_only_for_extracting_var.get() == 1:
+            if self.http_host != '' and self.http_port != '':
+                if p.check_proxy(self.http_host, self.http_port):
+                    y.extractor_proxy(self.http_host, self.http_port)
+                else:
+                    self.flag = 0
+                    t.show_info(title='Agent error', message='Your proxy address is not available, please check')
+                    return None
+        if self.use_proxy_var.get() == 1:
+            if self.http_host != '' and self.http_port != '':
+                if p.check_proxy(self.http_host, self.http_port):
+                    y.http_proxy(self.http_host, self.http_port)
+                else:
+                    self.flag = 0
+                    t.show_info(title='Agent error', message='Your proxy address is not available, please check')
+                    return None
+        if self.use_proxy_var.get() == 2:
+            if self.sock5_host != '' and self.sock5_port != '':
+                if p.check_proxy(self.http_host, self.http_port):
+                    y.socks5_hp(self.sock5_host, self.sock5_port)
+                else:
+                    self.flag = 0
+                    t.show_info(title='Agent error', message='Your proxy address is not available, please check')
+                    return None
+            elif self.sock5_host != '' and self.sock5_port != '' and self.sock5_password != '' and self.sock5_username != '':
+                if p.check_proxy(self.http_host, self.http_port):
+                    y.socks5_up(self.sock5_username, self.sock5_password, self.sock5_host, self.sock5_port)
+                else:
+                    self.flag = 0
+                    t.show_info(title='Agent error', message='Your proxy address is not available, please check')
+                    return None
+
+        if self.playlist_var.get() == 1:
+            y.playlist()
         # 输入值
         if self.m3u8_var.get() == 1:
             y.m3u8()
@@ -222,121 +304,8 @@ class App():
             y.insecure()
         if self.proxy_var.get() == 1:
             y.no_proxy()
-        if self.proxy_only_for_extracting_var.get() == 1:
-            y.extractor_proxy(self.http_host, self.http_port)
-        if self.use_http_var.get() == 1:
-            if self.http_host != '' and self.http_port != '':
-                y.http_proxy(self.http_host, self.http_port)
-        if self.use_socks_var.get() == 1:
-            if self.sock5_host != '' and self.sock5_port != '':
-                y.socks5_hp(self.sock5_host, self.sock5_port)
-            elif self.sock5_host != '' and self.sock5_port != '' and self.sock5_password != '' and self.sock5_username != '':
-                y.socks5_up(self.sock5_username, self.sock5_password, self.sock5_host, self.sock5_port)
-
-        if self.cookies != '':
-            y.cookies_file(self.cookies)
-        elif self.cookies == '':
-            self.nocookies = messagebox.askyesno('No cookies are submitted',
-                                                 'If you do not submit cookies, you will not be able to download VIP and HD videos')
-            if self.nocookies == False:
-                self.flag = 0
-                return None
-
-        if self.filename != '':
-            y.filename(self.filename)
-
-        if self.path != '':
-            y.output_dir(self.path)
-        elif self.path == '':
-            self.nopath = messagebox.askyesno('You did not enter a save path',
-                                              'The default save path is the user folder (%s), whether to continue' % self.home)
-            if self.nopath == True:
-                y.output_dir(self.home)
-            else:
-                self.flag = 0
-                return None
-
-    def save_path_command(self):
-        self.save_path_var.set(filedialog.askdirectory(initialdir=self.home, title='Open the storage path'))
-
-    def already_command(self):
-        """
-            确认信息
-            :return: 无返回值
-            """
-        # 传入真伪判断值
-
-        # 清空列表
-        y.cmd_list = [r".\depend\you-get.exe"]
-        self.set_all_command()
-        c.CMD = y.get_cmd_information()
-        print(self.cookies)
-        print("already:", c.CMD)
-        if self.flag == 1:
-            print("通过")
-            # 禁用控件
-            self.download_button.config(state='disable')
-            self.already_button.config(state='disable')
-            self.stream_combobox.config(state='disable')
-            self.get_url_button.config(state='disable')
-            self.get_json_button.config(state='disable')
-            self.get_information_button.config(state='disable')
-            self.get_version_button.config(state='disable')
-            # 提示用戶不要亂搞
-            t.show_info(title='Do not close the main program window',
-                        message='The URL is now being resolved and may take a long time. Please wait.\nDo not close the terminal')
-            # 下载json
-            t.write("%s/video_json.json" % self.home, t.get_json(self.url, cookies=self.cookies))
-            flag_json = t.get_json_stream("%s/video_json.json" % self.home)
-            if flag_json == 1:
-                # 获得所有键
-                c.STREAM_KEYS_LIST = list(c.STREAM_DICT.keys())
-                # 获得所有值
-                c.STREAM_VALUES_LIST = list(c.STREAM_DICT.values())
-                print(c.STREAM_VALUES_LIST)
-                # 配置下拉框
-                self.stream_combobox.config(values=c.STREAM_VALUES_LIST)
-
-                # 启用
-                self.download_button.config(state='active')
-                self.already_button.config(state='active')
-                self.stream_combobox.config(state='readonly')
-                self.get_url_button.config(state='active')
-                self.get_json_button.config(state='active')
-                self.get_information_button.config(state='active')
-                self.get_version_button.config(state='active')
-
-                # 获得指令内容
-                c.CMD = y.get_cmd_information()
-                # 清除上次生成的指令
-                self.command_var.set("Build The Command")
-                # 显示指令
-                self.command_var.set(c.CMD)
-                # 切换
-                self.download_button.config(style='Accent.TButton')
-                self.already_button.config(style='')
-            else:
-                # 启用
-                self.download_button.config(state='active')
-                self.already_button.config(state='active')
-                self.stream_combobox.config(state='readonly')
-                self.get_url_button.config(state='active')
-                self.get_json_button.config(state='active')
-                self.get_information_button.config(state='active')
-                self.get_version_button.config(state='active')
-                t.show_info(title='something was wrong',
-                            message='You entered the wrong information and could not start the download operation')
-
-        else:
-            print("未通过")
-            # 清空显示指令框
-            self.command_var.set("Build The Command")
-            # 禁用下载按钮
-            self.download_button['state'] = 'disabled'
-            # 重置为能通过状态
-            self.flag = 1
-            # 启用
-            self.already_button['state'] = 'active'
+        if self.debug_var.get() == 1:
+            y.debug()
 
     def already_thread(self):
         """
@@ -344,75 +313,95 @@ class App():
         :param args: 不用填形参
         :return: 不返回值
         """
+
+        def already_command():
+            """
+                确认信息
+                :return: 无返回值
+                """
+            # 传入真伪判断值
+
+            # 清空列表
+            y.cmd_list = [r".\depend\you-get.exe"]
+            self.set_all_command()
+            c.CMD = y.get_cmd_information()
+            print(y.get_cmd_information(y.cmd_list))
+            if self.flag == 1:
+                print("通过")
+                # 禁用控件
+                self.download_button.config(state='disable')
+                self.already_button.config(state='disable')
+                self.stream_combobox.config(state='disable')
+                # 提示用戶不要亂搞
+                t.show_info(title='Do not close the main program window',
+                            message='The URL is now being resolved and may take a long time. Please wait.\nDo not close the terminal')
+                if self.disable_batch_var.get() == 1 or self.playlist_var.get() == 1:
+                    # 下载json
+                    t.write("%s/video_json.json" % self.home, t.get_json(self.url, cookies=self.cookies))
+                    flag_json = t.get_json_stream("%s/video_json.json" % self.home)
+                    if flag_json == 1:
+                        # 获得所有键
+                        c.STREAM_KEYS_LIST = list(c.STREAM_DICT.keys())
+                        # 获得所有值
+                        c.STREAM_VALUES_LIST = list(c.STREAM_DICT.values())
+                        print(c.STREAM_VALUES_LIST)
+                        # 配置下拉框
+                        self.stream_combobox.config(values=c.STREAM_VALUES_LIST)
+
+                        # 启用
+                        self.download_button.config(state='active')
+                        self.already_button.config(state='active')
+                        self.stream_combobox.config(state='readonly')
+
+                        # 获得指令内容
+                        c.CMD = y.get_cmd_information()
+                        # 清除上次生成的指令
+                        self.command_var.set("Build The Command")
+                        # 显示指令
+                        self.command_var.set(c.CMD)
+                        # 切换
+                        self.download_button.config(style='Accent.TButton')
+                        self.already_button.config(style='')
+                    else:
+                        # 启用
+                        self.download_button.config(state='active')
+                        self.already_button.config(state='active')
+                        self.stream_combobox.config(state='readonly')
+                        t.show_info(title='something was wrong',
+                                    message='You entered the wrong information and could not start the download operation')
+                else:
+                    # 获得指令内容
+                    c.CMD = y.get_cmd_information()
+                    # 清除上次生成的指令
+                    self.command_var.set("Build The Command")
+                    # 显示指令
+                    self.command_var.set(c.CMD)
+                    # 切换
+                    self.download_button.config(style='Accent.TButton')
+                    self.already_button.config(style='')
+                    # 启用
+                    self.download_button.config(state='active')
+                    self.already_button.config(state='active')
+                    # self.stream_combobox.config(state='readonly')
+
+            else:
+                print("未通过")
+                # 清空显示指令框
+                self.command_var.set("Build The Command")
+                # 禁用下载按钮
+                self.download_button['state'] = 'disabled'
+                # 重置为能通过状态
+                self.flag = 1
+                # 启用
+                self.already_button['state'] = 'active'
         # 创建线程
-        self.makesure = threading.Thread(target=self.already_command, args='')
+        self.makesure = threading.Thread(target=already_command, args='')
 
         # 启动线程
         if self.makesure.is_alive() is False:
             self.makesure.start()
 
-    def show_download_link_command(self):
-        def get_link_start():
-            self.url = self.url_entry.get().replace('Video URL(Required)', '')
-            if self.url != '':
-                self.get_url = y.run_cmd([r'.\depend\you-get.exe', '--url', self.url])
-                self.command_text.delete('1.0', 'end')
-                self.command_text.insert('insert', self.get_url)
-            else:
-                messagebox.showerror('Enter the URL first',
-                                     'You did not enter a URL, so we can not get the URL for you')
-
-        self.get_link_thread = threading.Thread(target=get_link_start)
-        # 启动线程
-        if self.get_link_thread.is_alive() is False:
-            self.get_link_thread.start()
-
-    def show_extracted_info(self):
-        def show_extracted():
-            self.url = self.url_entry.get().replace('Video URL(Required)', '')
-            if self.url != '':
-                self.get_info = y.run_cmd([r'.\depend\you-get.exe', '--info', self.url])
-                self.command_text.delete('1.0', 'end')
-                self.command_text.insert('insert', self.get_info)
-            else:
-                messagebox.showerror('Enter the URL first',
-                                     'You did not enter a URL, so we can not get the infomation for you')
-
-        self.get_extracted_thread = threading.Thread(target=show_extracted)
-        # 启动线程
-        if self.get_extracted_thread.is_alive() is False:
-            self.get_extracted_thread.start()
-
-    def show_extracted_json(self):
-        def show_json():
-            self.url = self.url_entry.get().replace('Video URL(Required)', '')
-            if self.url != '':
-                self.get_json = y.run_cmd([r'.\depend\you-get.exe', '--json', self.url])
-                self.command_text.delete('1.0', 'end')
-                self.command_text.insert('insert', self.get_json)
-                self.savejson = messagebox.askyesno('Do you want to save Json?',
-                                                    'For aesthetics, the terminal is relatively small. Saving JSON to your local location makes it easy to view it')
-                if self.savejson == True:
-                    self.open_save_path = filedialog.askdirectory(title='Where you want to save it',
-                                                                  initialdir=self.home)
-                    # 写入文件
-                    t.write(r'%s\video_json.json' % self.open_save_path, self.get_json)
-
-            else:
-                messagebox.showerror('Enter the URL first',
-                                     'You did not enter a URL, so we can not get the infomation for you')
-
-        self.get_json_thread = threading.Thread(target=show_json)
-        # 启动线程
-        if self.get_json_thread.is_alive() is False:
-            self.get_json_thread.start()
-
-    def show_version(self):
-        self.get_version = y.run_cmd(['.\depend\you-get.exe', '--version'])
-        self.command_text.delete('1.0', 'end')
-        self.command_text.insert('insert', self.get_version)
-
-    def combobox_commands(self, event):
+    def combobox_command(self, event):
         """
         响应下拉框操作
         :param args: 不填形参
@@ -430,13 +419,14 @@ class App():
         :return: 返回执行结果
         """
         print(y.cmd_list)
-        self.cmd_info = y.run_cmd(y.cmd_list)
-        print(c.CMD)
+        y.stream_id(c.STREAM_ID)
+        y.download_cmd(y.cmd_list)
+        # print(c.CMD)
 
         # 解除禁用控件
         self.already_button['state'] = 'active'
         self.stream_combobox['state'] = 'readonly'
-        return self.cmd_info
+        # return self.cmd_info
 
     def download_command(self):
         """
@@ -455,11 +445,11 @@ class App():
             y.stream_id(c.STREAM_ID)
             print(c.STREAM_ID)
             # 发送下载指令
-            self.cmd = self.download_video()
+            self.download_video()
             # 显示对话框
             t.show_info(title='The download is complete', message='The video has been saved to the path you specified')
             # 结束后显示下载结果
-            self.command_text.insert('insert', self.cmd)
+            # self.command_text.insert('insert', self.cmd)
             # 切换状态
             self.download_button.config(style='', state='disable')
             self.already_button.config(style='Accent.TButton')
@@ -475,18 +465,21 @@ class App():
             cmd_thread.start()
 
     def auto_get_cookies(self):
-        print(t.get_firefox_cookie_path())
         self.cookies_var.set(t.get_firefox_cookie_path())
 
     def import_cookies(self):
         self.cookies_var.set(filedialog.askopenfilename(title='Open the Cookies path', initialdir=self.home,
                                                         filetypes=[('cookies.sqlite', 'cookies.sqlite'),
-                                                                   ('cookies.txt', 'cookies.txt')]))
+                                                                   ('cookies.txt', 'cookies.txt'),
+                                                                   ('*', "*.")]))
+    def open_urls(self):
+        self.batch_var.set(filedialog.askopenfilename(title='Open the URLs File path', initialdir=self.home,
+                                                        filetypes=[('txt', '.txt'),
+                                                                   ('*', "*.")]))
 
     def theme_config(self):
         # 如果是明亮主题
         if sv_ttk.get_theme() == 'light':
-            print(1)
             # 更改标题栏
             self.manage.dwm_set_window_attribute_use_dark_mode()
             # 更改配色
@@ -507,6 +500,16 @@ class App():
             self.theme_var.set(0)
 
     def download_options(self):
+        def disable_force():
+            if self.rename_var.get() == 1:
+                self.force_file_check.config(state='disable')
+            else:
+                self.force_file_check.config(state='active')
+        def disable_rename():
+            if self.overwrite_var.get() == 1:
+                self.auto_rename_check.config(state='disable')
+            else:
+                self.auto_rename_check.config(state='active')
         # 下载选项的背景框
         self.download_labelframe = LabelFrame(text='Download Options', padding=15)
         # m3u8 检查按钮
@@ -514,10 +517,10 @@ class App():
                                       style='myCheck.TCheckbutton', variable=self.m3u8_var)
         # 自动重命名 检查按钮
         self.auto_rename_check = Checkbutton(self.download_labelframe, text='Auto Rename', state='normal',
-                                             style='myCheck.TCheckbutton', variable=self.rename_var)
+                                             style='myCheck.TCheckbutton', variable=self.rename_var, command=disable_force)
         # 强制覆盖重名文件 检查按钮
-        self.force_file_check = Checkbutton(self.download_labelframe, text='Overwrite Files', state='normal',
-                                            style='myCheck.TCheckbutton', variable=self.overwrite_var)
+        self.force_file_check = Checkbutton(self.download_labelframe, text='Overwrite Files', state='disable',
+                                            style='myCheck.TCheckbutton', variable=self.overwrite_var, command=disable_rename)
         # 不检查文件大小检查按钮
         self.skip_check_check = Checkbutton(self.download_labelframe, text='Skip Check File Size', state='normal',
                                             style='myCheck.TCheckbutton', variable=self.check_size_var)
@@ -527,47 +530,74 @@ class App():
         # 不合并视频
         self.no_merge_check = Checkbutton(self.download_labelframe, text='Merge Video Parts', state='normal',
                                           style='myCheck.TCheckbutton', variable=self.merge_var)
+        # 忽略 ssl 错误
+        self.ignore_ssl_check = Checkbutton(self.download_labelframe, text='Ignore SSL Errors', state='normal',
+                                            style='myCheck.TCheckbutton', variable=self.ssl_var)
+        # debug 模式下载
+        self.debug_check = Checkbutton(self.download_labelframe, text='Debug Mode', state='normal',
+                                            style='myCheck.TCheckbutton', variable=self.debug_var)
+        # 套接字延时
+        self.socket_time_entry = EntryWithPlaceholder(self.download_labelframe, 'Socket Timeout')
 
         self.m3u8_check.pack(fill='x', pady=5, padx=5)
+        self.ignore_ssl_check.pack(fill='x', pady=5, padx=5)
+        self.skip_check_check.pack(fill='x', pady=5, padx=5)
         self.auto_rename_check.pack(fill='x', pady=5, padx=5)
         self.force_file_check.pack(fill='x', pady=5, padx=5)
-        self.skip_check_check.pack(fill='x', pady=5, padx=5)
         self.no_caption_check.pack(fill='x', pady=5, padx=5)
         self.no_merge_check.pack(fill='x', pady=5, padx=5)
-        self.download_labelframe.place(x=10, y=10, width=230, height=280)
+        self.debug_check.pack(fill='x', pady=5, padx=5)
+        self.socket_time_entry.pack(fill='x', pady=5, padx=5)
+        self.download_labelframe.place(x=10, y=10, width=230, height=400)
 
-    def debug_options(self):
-        # 调试选项的背景框
-        self.debug_labelframe = Labelframe(text='Debug Options', padding=15)
-        # 下载调试模式
-        self.download_debug_check = Checkbutton(self.debug_labelframe, text='Show Debug Info', state='normal',
-                                                style='myCheck.TCheckbutton', variable=self.debug_var)
-        # 忽略 ssl 错误
-        self.ignore_ssl_check = Checkbutton(self.debug_labelframe, text='Ignore SSL Errors', state='normal',
-                                            style='myCheck.TCheckbutton', variable=self.ssl_var)
-        # 获得下载 URL
-        self.get_url_button = Button(self.debug_labelframe, text='Show Download Link', state='normal',
-                                     style='myButton.TButton', command=self.show_download_link_command)
-        # 获得解析内容
-        self.get_information_button = Button(self.debug_labelframe, text='Show Extracted Info', state='normal',
-                                             style='myButton.TButton', command=self.show_extracted_info)
-        # 获得信息json
-        self.get_json_button = Button(self.debug_labelframe, text='Show Extracted Json', state='normal',
-                                      style='myButton.TButton', command=self.show_extracted_json)
-        # 查看版本
-        self.get_version_button = Button(self.debug_labelframe, text='Show Version', state='normal',
-                                         style='myButton.TButton', command=self.show_version)
-        # 套接字延时
-        self.socket_time_entry = EntryWithPlaceholder(self.debug_labelframe, 'Socket Timeout')
+    def batch_options(self):
+        """
+        批量下载区域
+        :return:
+        """
+        def disable_input_file():
+            if self.playlist_var.get() == 1:
+                self.input_file_entry.config(state='disable')
+                self.input_file_button.config(state='disable')
+                self.input_file_label.config(state='disable')
+                self.url_entry.config(state='active')
+            else:
+                self.input_file_entry.config(state='active')
+                self.input_file_button.config(state='active')
+                self.input_file_label.config(state='active')
+                self.url_entry.config(state='disable')
+        def disable_batch_options():
+            print(self.disable_batch_var.get() == 1)
+            if self.disable_batch_var.get() == 1:
+                print('disable')
+                self.playlist_var.set(0)
+                self.input_file_entry.config(state='disable')
+                self.input_file_button.config(state='disable')
+                self.input_file_label.config(state='disable')
+                self.playlist_check.config(state='disable')
+                self.stream_combobox.config(state='disable')
+                self.url_entry.config(state='active')
+            else:
+                self.playlist_check.config(state='active')
+                self.playlist_var.set(1)
+        # 批量下载选项的背景框
+        self.batch_labelframe = LabelFrame(text='Batch Download Options', padding=15)
+        self.disable_batch_check = Checkbutton(self.batch_labelframe, text='Disable Batch Options', state='normal',
+                                               style='myCheck.TCheckbutton', variable=self.disable_batch_var, command=disable_batch_options)
+        self.playlist_check = Checkbutton(self.batch_labelframe, text='Download Playlist', state='normal',
+                                          style='myCheck.TCheckbutton', variable=self.playlist_var, command=disable_input_file)
+        self.input_file_entry = Entry(self.batch_labelframe, textvariable=self.batch_var, state='disable')
+        self.input_file_button = Button(self.batch_labelframe, text='Open Save URLs File', command=self.open_urls, state='disable')
 
-        self.download_debug_check.pack(fill='x', pady=5, padx=5)
-        self.ignore_ssl_check.pack(fill='x', pady=5, padx=5)
-        self.get_url_button.pack(fill='x', pady=5, padx=5)
-        self.get_information_button.pack(fill='x', pady=5, padx=5)
-        self.get_json_button.pack(fill='x', pady=5, padx=5)
-        self.get_version_button.pack(fill='x', pady=5, padx=5)
-        self.socket_time_entry.pack(fill='x', padx=5, pady=5)
-        self.debug_labelframe.place(x=10, y=300, width=230, height=380)
+        self.input_file_label = Label(self.batch_labelframe, state='disable', text='Automatically download videos\nwith multiple links')
+
+        self.disable_batch_check.pack(fill='x', pady=5, padx=5)
+        self.playlist_check.pack(fill='x', pady=5, padx=5)
+        self.input_file_entry.pack(fill='x', pady=5, padx=5)
+        self.input_file_button.pack(fill='x', pady=5, padx=5)
+        self.input_file_label.pack(fill='both', pady=5, padx=5)
+        self.batch_labelframe.place(x=10, y=420, height=260, width=230)
+
 
     def proxy_options(self):
         # 代理选项的背景框
@@ -585,9 +615,8 @@ class App():
                                                command=self.only_for_extracting_command)
 
         # 使用 http 代理
-        self.use_http_check = Checkbutton(self.proxy_labelframe, text='Use HTTP Proxy', state='normal',
-                                          style='myButton.TCheckbutton', variable=self.use_http_var,
-                                          command=self.use_http_command)
+        self.use_http_check = Radiobutton(self.proxy_labelframe, text='Use HTTP Proxy', state='normal', variable=self.use_proxy_var,
+                                          command=self.use_proxy_command, value=1)
         # http 代理主机输入框
         self.http_host_entry = EntryWithPlaceholder(self.proxy_labelframe, 'HTTP Proxy (HOST)')
         self.http_host_entry.config(state='disable')
@@ -596,9 +625,8 @@ class App():
         self.http_port_entry.config(state='disable')
 
         # 使用 socks 代理
-        self.use_socks_check = Checkbutton(self.proxy_labelframe, text='Use SOCKS Proxy', state='normal',
-                                           style='myButton.TCheckbutton', variable=self.use_socks_var,
-                                           command=self.use_socks_command)
+        self.use_socks_check = Radiobutton(self.proxy_labelframe, text='Use SOCKS Proxy', state='normal', variable=self.use_proxy_var,
+                                           command=self.use_proxy_command, value=2)
         # 分割线
         self.socks_separator = Separator(self.proxy_labelframe)
         # socks5 代理主机输入框
@@ -670,7 +698,7 @@ class App():
         self.command_entry = Entry(self.start_labelframe, textvariable=self.command_var)
         # 清晰度下拉框
         self.stream_combobox = Combobox(self.start_labelframe, state='disable')
-        self.stream_combobox.bind('<<ComboboxSelected>>', self.combobox_commands)
+        self.stream_combobox.bind('<<ComboboxSelected>>', self.combobox_command)
         # 分割线
         self.download_separator = Separator(self.start_labelframe)
         # 开始下载按钮
@@ -699,7 +727,7 @@ class App():
         self.download_button.pack(fill='x', padx=5, pady=5)
         self.download_separator_last.pack(fill='x', padx=5, pady=10)
 
-        self.command_text.pack(fill='x', padx=5, pady=5)
+        # self.command_text.pack(fill='x', padx=5, pady=5)
         self.start_labelframe.place(x=490, y=10, width=300, height=670)
 
     def about_program(self):
@@ -730,8 +758,8 @@ class App():
         self.project_based = Label(self.about_us_labelframe, text='Project-based:\nyou-get\nsv-ttk')
 
         self.change_theme_check.pack(fill='x', padx=5, pady=5)
-        self.open_options_button.pack(fill='x', padx=5, pady=5)
-        self.help_button.pack(fill='x', padx=5, pady=5)
+        # self.open_options_button.pack(fill='x', padx=5, pady=5)
+        # self.help_button.pack(fill='x', padx=5, pady=5)
         self.about_us_labelframe.pack(fill='x', padx=5, pady=5)
         self.contributors_label.pack(fill='x', padx=5, pady=5)
         self.version_label.pack(fill='x', padx=5, pady=5)
@@ -742,10 +770,14 @@ class App():
         self.about_labelframe.place(x=800, y=10, height=670, width=250)
 
     def run(self):
+        # 创建窗口
+        self.root_create()
+        # 设定变量
+        self.var_create()
         # 下载选项控件
         self.download_options()
         # 调试选项控件
-        self.debug_options()
+        self.batch_options()
         # 代理选项控件
         self.proxy_options()
         # 保存选项控件

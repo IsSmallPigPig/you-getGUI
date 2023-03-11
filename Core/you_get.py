@@ -1,8 +1,7 @@
 import subprocess
-
+import sys
 # 指令列表
 cmd_list = [r".\depend\you-get.exe"]
-
 
 def video_url(url):
     """
@@ -12,6 +11,17 @@ def video_url(url):
     """
     cmd_list.append(url)
 
+def download_cmd(cmd_list):
+    """
+    下载使用方法
+    :param cmd_list:命令列表
+    :return: 不返回值
+    """
+    # os.startfile(get_cmd_information(cmd_list))
+    print(cmd_list)
+    subprocess.call(cmd_list)
+    # sys.argv = cmd_list
+    # you_get.main()
 
 def run_cmd(cmd_run: list):
     """
@@ -19,7 +29,6 @@ def run_cmd(cmd_run: list):
     :param cmd: 指令列表
     :return: stdout
     """
-    print(cmd_run)
     # 运行指令
     cmd = subprocess.run(
         cmd_run,
@@ -39,9 +48,7 @@ def info(url, cookies=''):
     :param cookies: 可选cookies
     :return: 返回信息
     """
-    print(cookies)
     if cookies == '':
-        # print(run_cmd([r".\depend\you-get.exe", '-i', url]))
         return run_cmd([r".\depend\you-get.exe", '-i', url])
     else:
         return run_cmd([r".\depend\you-get.exe", '-i', url, '-c', cookies])
@@ -243,6 +250,15 @@ def insecure(*args):
     cmd_list.append('--insecure')
     return None
 
+def input_file(file):
+    """
+    导入需要下载的链接文件
+    :param file: 存储位置
+    :return: 无返回值
+    """
+    cmd_list.append('--input-file')
+    cmd_list.append(file)
+
 
 def m3u8(*args):
     """
@@ -312,15 +328,8 @@ def socks5_up(username: str, password: str, host: str, port: str):
     return None
 
 
-def get_cmd_information():
+def get_cmd_information(cmd = cmd_list):
     cmd_string = ""
     for i in cmd_list:
         cmd_string += " " + i
     return cmd_string
-
-
-if __name__ == '__main__':
-    # print(info("https://www.bilibili.com/video/BV1gg411s728/?spm_id_from=333.1007.tianma.1-2-2.click"))
-    # filename("test")
-    # get_cmd_information()
-    pass
