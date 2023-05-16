@@ -1,4 +1,5 @@
 # 导入requests库和re模块
+# 好用的
 import requests
 
 # 定义一个函数，接受一个代理地址作为参数，返回True或False表示是否有效
